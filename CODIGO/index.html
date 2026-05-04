@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Manager IU</title>
+    <link rel="icon" href="data:,">
+
+    <link rel="stylesheet" type="text/css" href="./css/IU.css" media="screen">
+
+    <script type="text/javascript" src="./js/data/menu_entidades.js"></script>
+    <script type="text/javascript" src="./js/data/Julio_Datos_AlbertoAndresFaublakAlvarez.js"></script>
+
+    <script type="text/javascript" src="./js/entities/analysis_preparation_estructura.js"></script>
+    <script type="text/javascript" src="./js/entities/characteristic_estructura.js"></script>
+    <script type="text/javascript" src="./js/entities/project_estructura.js"></script>
+
+    <script type="text/javascript" src="./js/classes/project_Class.js"></script>
+
+    <script type="text/javascript" src="./js/tests/analysis_preparation_tests.js"></script>
+    <script type="text/javascript" src="./js/tests/characteristic_tests.js"></script>
+    <script type="text/javascript" src="./js/tests/project_tests.js"></script>
+
+    <script type="text/javascript" src="./js/tests/analysis_preparation_TestSubmit.js"></script>
+    <script type="text/javascript" src="./js/tests/characteristic_TestSubmit.js"></script>
+    <script type="text/javascript" src="./js/tests/project_TestSubmit.js"></script>
+
+    <script type="text/javascript" src="./js/classes/Validations_Class.js"></script>
+    <script type="text/javascript" src="./js/classes/ValidateFieldsForm_Class.js"></script>
+    <script type="text/javascript" src="./js/classes/Gestor_Class.js"></script>
+    <script type="text/javascript" src="./js/classes/TestForm_Class.js"></script>
+    <script type="text/javascript" src="./js/classes/TestSubmit_Class.js"></script>
+</head>
+<body>
+
+    <header id="header_page">
+        <div class="header-left">
+            <a href="index.html" id="home_link" title="Volver al inicio">
+                <h1>Test Manager IU</h1>
+            </a>
+        </div>
+        <div class="header-right">
+            <a href="API.html" class="api-link" title="Documentacion API">
+                <img src="./iconos/API.png" alt="API" class="icon-link"> API
+            </a>
+        </div>
+    </header>
+
+    <nav id="nav_menu">
+        <button id="btn-menu" aria-expanded="false" onclick="toggleMenu()">
+            <span class="menu-icon">&#9776;</span>
+            <span>Entidades</span>
+        </button>
+        <div id="div-menu" hidden>
+            <ol id="menu-list"></ol>
+        </div>
+    </nav>
+
+    <main id="workspace">
+        <div id="work-area">
+            <div class="welcome-section">
+                <h2>Sistema de Pruebas</h2>
+                <p>Seleccione una entidad del menu para iniciar las pruebas de validacion.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer_page">
+        <div class="footer-content">
+            <p>Interfaces de Usuario - Curso 2025-2026</p>
+            <p>Entrega Julio - Alberto Andres Faublak Alvarez</p>
+        </div>
+    </footer>
+
+    <div id="modal_overlay" class="modal-overlay" hidden role="dialog" aria-modal="true">
+        <div id="error_modal" class="modal modal-error" hidden>
+            <div class="modal-header">
+                <h3>Error</h3>
+                <button class="modal-close" onclick="closeErrorModal()" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body" id="error_modal_body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeErrorModal()">
+                    <img src="./iconos/BACK.png" alt="" class="btn-icon-img"> Volver al Inicio
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result_overlay" class="modal-overlay" hidden role="dialog" aria-modal="true">
+        <div id="result_modal" class="modal modal-large">
+            <div class="modal-header">
+                <h2 id="result_modal_title">Resultados</h2>
+                <button class="modal-close" onclick="closeResultModal()" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body" id="result_modal_body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeResultModal()">
+                    <img src="./iconos/BACK.png" alt="" class="btn-icon-img"> Volver al Inicio
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function prettyEntityName(name) {
+            return name
+                .split("_")
+                .map(function(p) { return p.charAt(0).toUpperCase() + p.slice(1); })
+                .join(" ");
+        }
+
+        function buildMenu() {
+            var menuList = document.getElementById("menu-list");
+            if (!menuList) return;
+
+            if (typeof menu_entidades === "undefined" || !Array.isArray(menu_entidades)) {
+                console.error("La variable menu_entidades no esta definida o no es un array.");
+                return;
+            }
+
+            menuList.innerHTML = "";
+
+            menu_entidades.forEach(function(entityName) {
+                var li = document.createElement("li");
+                var btn = document.createElement("button");
+                btn.textContent = prettyEntityName(entityName);
+                btn.id = "menu_" + entityName;
+                btn.addEventListener("click", function() {
+                    var gestor = new Gestor();
+                    gestor.seleccionarEntidad(entityName);
+                    toggleMenu();
+                });
+                li.appendChild(btn);
+                menuList.appendChild(li);
+            });
+        }
+
+        function toggleMenu() {
+            var menu = document.getElementById("div-menu");
+            var btn = document.getElementById("btn-menu");
+            menu.hidden = !menu.hidden;
+            btn.setAttribute("aria-expanded", String(!menu.hidden));
+        }
+
+        function closeErrorModal() {
+            document.getElementById("modal_overlay").hidden = true;
+            document.getElementById("error_modal").hidden = true;
+        }
+
+        function closeResultModal() {
+            document.getElementById("result_overlay").hidden = true;
+            document.getElementById("result_modal_body").innerHTML = "";
+        }
+
+        document.getElementById("modal_overlay").addEventListener("click", function(e) {
+            if (e.target === this) closeErrorModal();
+        });
+
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape") {
+                if (!document.getElementById("modal_overlay").hidden) closeErrorModal();
+                if (!document.getElementById("result_overlay").hidden) closeResultModal();
+            }
+        });
+
+        window.addEventListener("load", function() {
+            buildMenu();
+        });
+    </script>
+
+</body>
+</html>

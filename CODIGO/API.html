@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentacion API</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" type="text/css" href="./css/IU.css" media="screen">
+</head>
+<body>
+
+    <header id="header_page">
+        <div class="header-left">
+            <a href="index.html" id="home_link" title="Volver al inicio">
+                <h1>Test Manager IU</h1>
+            </a>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="api-link" title="Volver al inicio">
+                <img src="./iconos/BACK.png" alt="Volver" class="icon-link"> Volver
+            </a>
+        </div>
+    </header>
+
+    <main id="workspace">
+    <div class="api-container">
+
+        <div class="api-section">
+            <h2>Clases para Validaciones</h2>
+
+            <div class="api-class" id="class-Validations">
+                <h3>Validations <code>Validations_Class.js</code></h3>
+                <p>Clase que contiene todas las validaciones atomicas sobre atributos de formulario. Cada metodo recibe el ID del elemento HTML a validar.</p>
+
+                <div class="api-method">
+                    <strong>min_size(elementId, minSize)</strong>
+                    <p>Valida que el valor del elemento tenga al menos <code>minSize</code> caracteres.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del elemento HTML</td></tr>
+                            <tr><td>minSize</td><td>number</td><td>Tamano minimo requerido</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el valor tiene longitud &gt;= minSize</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>max_size(elementId, maxSize)</strong>
+                    <p>Valida que el valor del elemento no exceda <code>maxSize</code> caracteres.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del elemento HTML</td></tr>
+                            <tr><td>maxSize</td><td>number</td><td>Tamano maximo permitido</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el valor tiene longitud &lt;= maxSize</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>format(elementId, regexpStr)</strong>
+                    <p>Valida que el valor del elemento cumpla con la expresion regular proporcionada.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del elemento HTML</td></tr>
+                            <tr><td>regexpStr</td><td>string</td><td>Expresion regular como cadena</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el valor cumple con el formato</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>no_file(elementId)</strong>
+                    <p>Verifica que un input file tenga un archivo seleccionado.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del input file</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si hay archivo seleccionado</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>format_name_file(elementId, regexpStr)</strong>
+                    <p>Valida el formato del nombre del archivo seleccionado.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del input file</td></tr>
+                            <tr><td>regexpStr</td><td>string</td><td>Expresion regular para el nombre</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el nombre cumple el formato</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>type_file(elementId, allowedTypes)</strong>
+                    <p>Valida que el tipo MIME del archivo este entre los permitidos.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del input file</td></tr>
+                            <tr><td>allowedTypes</td><td>Array&lt;string&gt;</td><td>MIME types permitidos</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el tipo esta permitido</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>max_size_file(elementId, maxSize)</strong>
+                    <p>Valida que el tamano del archivo no exceda el maximo en bytes.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del input file</td></tr>
+                            <tr><td>maxSize</td><td>number</td><td>Tamano maximo en bytes</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el archivo no supera el tamano</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>personalized(elementId, entityInstance, attrName, allValues)</strong>
+                    <p>Ejecuta una validacion personalizada definida en la clase de la entidad.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del elemento HTML</td></tr>
+                            <tr><td>entityInstance</td><td>object</td><td>Instancia de la clase de la entidad</td></tr>
+                            <tr><td>attrName</td><td>string</td><td>Nombre del atributo</td></tr>
+                            <tr><td>allValues</td><td>object</td><td>Todos los valores del formulario</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; true si valido, o codigo de error</p>
+                </div>
+            </div>
+
+            <div class="api-class" id="class-ValidateFieldsForm">
+                <h3>ValidateFieldsForm <code>ValidateFieldsForm_Class.js</code></h3>
+                <p>Clase que crea los campos HTML individuales de cada atributo, los rellena con valores de prueba y ejecuta las validaciones.</p>
+
+                <div class="api-method">
+                    <strong>createField(attrName, attrDef, action)</strong>
+                    <p>Crea un elemento HTML del formulario segun la definicion del atributo. Soporta los tags <code>input</code>, <code>file</code>, <code>select</code>, <code>checkbox</code>, <code>radio</code> y <code>textarea</code>. Si el atributo es de tipo file pero la accion no usa validaciones especificas de fichero (no_file, type_file, format_name_file, max_size_file), se crea como input de texto para poder rellenarlo con un nombre.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>attrName</td><td>string</td><td>Nombre del atributo (usado como id y name del elemento creado).</td></tr>
+                            <tr><td>attrDef</td><td>object</td><td>Definicion del atributo (campos <code>html</code>, <code>validations</code>...).</td></tr>
+                            <tr><td>action</td><td>string</td><td>Accion en curso (ADD, EDIT, SEARCH). Opcional; permite decidir si un campo file se trata como texto para esa accion.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>HTMLElement</code> &mdash; El elemento HTML creado.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>setValue(element, value, fileData)</strong>
+                    <p>Asigna un valor al elemento. Para campos file, crea un mock File.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>element</td><td>HTMLElement</td><td>Elemento HTML</td></tr>
+                            <tr><td>value</td><td>*</td><td>Valor a asignar</td></tr>
+                            <tr><td>fileData</td><td>object</td><td>Datos del fichero {name, type, size}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>executeValidation(validationType, elementId, param, entityInstance, attrName, allValues)</strong>
+                    <p>Ejecuta una validacion atomica sobre un campo utilizando Validations.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>validationType</td><td>string</td><td>Tipo de validacion</td></tr>
+                            <tr><td>elementId</td><td>string</td><td>ID del elemento</td></tr>
+                            <tr><td>param</td><td>*</td><td>Parametro de validacion</td></tr>
+                            <tr><td>entityInstance</td><td>object</td><td>Instancia de la clase entidad</td></tr>
+                            <tr><td>attrName</td><td>string</td><td>Nombre del atributo</td></tr>
+                            <tr><td>allValues</td><td>object</td><td>Valores del formulario</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; Resultado de la validacion</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>createTestContainer()</strong>
+                    <p>Crea un contenedor oculto en el DOM para campos de prueba.</p>
+                    <p><strong>Retorna:</strong> <code>HTMLElement</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>cleanup()</strong>
+                    <p>Elimina el contenedor oculto de pruebas del DOM.</p>
+                </div>
+            </div>
+
+            <div class="api-class" id="class-project">
+                <h3>project <code>project_Class.js</code></h3>
+                <p>Clase de la entidad <code>project</code>. Contiene las validaciones personalizadas declaradas con <code>personalize: true</code> en la estructura, una por cada atributo personalizado.</p>
+
+                <div class="api-method">
+                    <strong>end_date_project_personalized_validation(endDateValue, allValues)</strong>
+                    <p>Valida que la fecha de fin del proyecto sea posterior a la fecha de inicio.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>endDateValue</td><td>string</td><td>Valor de la fecha de fin en formato dd/mm/aaaa.</td></tr>
+                            <tr><td>allValues</td><td>object</td><td>Objeto con todos los valores del formulario; debe incluir <code>start_date_project</code>.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si la fecha de fin es mayor que la de inicio, o el codigo de error <code>end_date_project_personalized_KO</code> en caso contrario.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>Clases para Tests</h2>
+
+            <div class="api-class" id="class-TestForm">
+                <h3>TestForm <code>TestForm_Class.js</code></h3>
+                <p>Clase que ejecuta los tests de atributos. Crea un modal con la informacion de estructura, definiciones de test y resultados de pruebas.</p>
+
+                <div class="api-method">
+                    <strong>constructor(entityName)</strong>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad a testear</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>run()</strong>
+                    <p>Ejecuta los tests (estructura, definicion de tests y pruebas) y muestra el modal de resultados.</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>renderSummary()</strong>
+                    <p>Pinta en el cuerpo del modal el resumen completo (estructura + definiciones + pruebas) y enlaza el boton "Ver detalle".</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>renderDetails()</strong>
+                    <p>Pinta en el cuerpo del modal el detalle de cada prueba con su resultado obtenido y un boton "Volver al Resumen".</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>checkStructure()</strong>
+                    <p>Comprueba si la estructura de la entidad es correcta (entity, attributes_list, attributes, validaciones).</p>
+                    <p><strong>Retorna:</strong> <code>object</code> &mdash; {isCorrect, errors, attributes}</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>checkDefTests()</strong>
+                    <p>Verifica las definiciones de test: cantidad, tipos correctos por campo, y agrupacion por atributo.</p>
+                    <p><strong>Retorna:</strong> <code>object</code> &mdash; {total, wellDefined, byAttribute, details}</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>runPruebas()</strong>
+                    <p>Ejecuta las pruebas de validacion de atributos.</p>
+                    <p><strong>Retorna:</strong> <code>object</code> &mdash; {total, wellDefined, withErrorExpected, withSuccessExpected, passed, failed, details}</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>executePrueba(campo, attrDef, accion, valoresAtributos, numDefTest)</strong>
+                    <p>Ejecuta una prueba individual sobre un campo.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>campo</td><td>string</td><td>Nombre del campo/atributo</td></tr>
+                            <tr><td>attrDef</td><td>object</td><td>Definicion del atributo</td></tr>
+                            <tr><td>accion</td><td>string</td><td>Accion (ADD, EDIT, SEARCH)</td></tr>
+                            <tr><td>valoresAtributos</td><td>*</td><td>Valores a probar</td></tr>
+                            <tr><td>numDefTest</td><td>number</td><td>Numero de definicion de test</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; true si pasa, o codigo de error</p>
+                </div>
+            </div>
+
+            <div class="api-class" id="class-Gestor">
+                <h3>Gestor <code>Gestor_Class.js</code></h3>
+                <p>Clase que gestiona la seleccion de entidades y comprueba que existan todos los ficheros/variables necesarios.</p>
+
+                <div class="api-method">
+                    <strong>seleccionarEntidad(entityName)</strong>
+                    <p>Selecciona una entidad, verifica las variables requeridas y muestra los botones de test.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si todas las variables existen, false si hay errores</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>showErrorModal(errors)</strong>
+                    <p>Muestra una ventana modal con los errores encontrados.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>errors</td><td>Array&lt;string&gt;</td><td>Lista de mensajes de error</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>showTestButtons(entityName)</strong>
+                    <p>Muestra los botones "Test de Atributos" y "Test de Formulario", junto al boton "Volver al Inicio".</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>hideTestButtons()</strong>
+                    <p>Oculta los botones de test y muestra el mensaje de bienvenida.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>Clases para Comprobar el Submit</h2>
+
+            <div class="api-class" id="class-TestSubmit">
+                <h3>TestSubmit <code>TestSubmit_Class.js</code></h3>
+                <p>Clase que ejecuta las pruebas de submit del formulario. Verifica todos los atributos para cada accion (ADD, EDIT, SEARCH) sin realizar peticiones al backend.</p>
+
+                <div class="api-method">
+                    <strong>constructor(entityName)</strong>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad a testear</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>run()</strong>
+                    <p>Ejecuta todas las pruebas de submit y muestra el modal de resultados.</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>renderSummary()</strong>
+                    <p>Pinta en el cuerpo del modal la tabla resumen por accion (ADD, EDIT, SEARCH) y enlaza el boton "Ver detalle".</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>renderDetails()</strong>
+                    <p>Pinta en el cuerpo del modal el detalle prueba a prueba con resultado esperado / obtenido y un boton "Volver al Resumen".</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>CheckSubmit(accion, atributosValores)</strong>
+                    <p>Comprueba todos los atributos requeridos para la accion. Acumula todos los errores encontrados y los devuelve, o <code>true</code> si no hay ninguno. No realiza llamada al backend.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>accion</td><td>string</td><td>Accion (ADD, EDIT, SEARCH)</td></tr>
+                            <tr><td>atributosValores</td><td>object</td><td>Objeto {nombreAtributo: valor, ...}</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean|Array&lt;string&gt;</code> &mdash; <code>true</code> si todo correcto, o un array con todos los codigos de error encontrados.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>runAllSubmitTests()</strong>
+                    <p>Ejecuta todas las pruebas definidas en <code>nombreentidad_TestSubmit</code>.</p>
+                    <p><strong>Retorna:</strong> <code>object</code> &mdash; {byAction, total, totalCorrect, totalIncorrect, allDetails}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>Diagramas de Flujo</h2>
+            <p class="api-hint">Diagramas autonomos (sin dependencias externas) que describen el flujo a nivel de codigo.</p>
+
+            <div class="api-class">
+                <h3>Flujo General del Sistema</h3>
+                <p>Desde la carga de <code>index.html</code> hasta la ejecucion de los tests.</p>
+                <div class="flowchart">
+                    <div class="flow-box flow-start">Cargar index.html</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Leer menu_entidades (script en head)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Generar menu dinamico</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Usuario selecciona entidad</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box"><a href="#class-Gestor">Gestor.seleccionarEntidad(entityName)</a></div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-decision">&iquest;Existen las variables<br>_estructura, _def_tests, _pruebas, _TestSubmit?</div>
+                    <div class="flow-branches">
+                        <div class="flow-branch">
+                            <div class="flow-arrow">No &darr;</div>
+                            <div class="flow-box flow-error">Modal de error</div>
+                        </div>
+                        <div class="flow-branch">
+                            <div class="flow-arrow">Si &darr;</div>
+                            <div class="flow-box">Mostrar botones de test</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-decision">&iquest;Que boton se pulsa?</div>
+                            <div class="flow-branches">
+                                <div class="flow-branch">
+                                    <div class="flow-arrow">Test de Atributos &darr;</div>
+                                    <div class="flow-box"><a href="#class-TestForm">TestForm.run()</a></div>
+                                    <div class="flow-arrow">&darr;</div>
+                                    <div class="flow-box flow-end">Modal con resultados de atributos</div>
+                                </div>
+                                <div class="flow-branch">
+                                    <div class="flow-arrow">Test de Formulario &darr;</div>
+                                    <div class="flow-box"><a href="#class-TestSubmit">TestSubmit.run()</a></div>
+                                    <div class="flow-arrow">&darr;</div>
+                                    <div class="flow-box flow-end">Modal con resultados de submit</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="api-class">
+                <h3>Flujo de TestForm</h3>
+                <p>Proceso detallado de la ejecucion de tests de atributos.</p>
+                <div class="flowchart">
+                    <div class="flow-box flow-start">TestForm.run()</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Leer estructura, def_tests y pruebas</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-decision">&iquest;Existe la clase de la entidad?</div>
+                    <div class="flow-branches">
+                        <div class="flow-branch">
+                            <div class="flow-arrow">Si &darr;</div>
+                            <div class="flow-box">Instanciar entityClass</div>
+                        </div>
+                        <div class="flow-branch">
+                            <div class="flow-arrow">No &darr;</div>
+                            <div class="flow-box">entityInstance = null</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">checkStructure() &mdash; entidad y atributos</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">checkDefTests() &mdash; tipos por campo, conteo por atributo</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">runPruebas()</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box"><a href="#class-ValidateFieldsForm">ValidateFieldsForm</a>: createTestContainer()</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Para cada prueba: createField(...) + setValue(...)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box"><a href="#class-Validations">Validations</a>: executeValidation(validationType, id, param, ...)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Comparar resultadoObtenido con resultadoEsperado</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box flow-end">Render modal: resumen + boton "Ver detalle"</div>
+                </div>
+            </div>
+
+            <div class="api-class">
+                <h3>Flujo de TestSubmit</h3>
+                <p>Proceso detallado de la comprobacion de submit.</p>
+                <div class="flowchart">
+                    <div class="flow-box flow-start">TestSubmit.run()</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Leer estructura y TestSubmit</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Para cada prueba: CheckSubmit(accion, valores)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Crear campos HTML para todos los atributos</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Para cada atributo con validaciones[accion]</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-decision">&iquest;PK autoincrement en ADD?</div>
+                    <div class="flow-branches">
+                        <div class="flow-branch">
+                            <div class="flow-arrow">Si &darr;</div>
+                            <div class="flow-box">Saltar atributo</div>
+                        </div>
+                        <div class="flow-branch">
+                            <div class="flow-arrow">No &darr;</div>
+                            <div class="flow-decision">&iquest;SEARCH con valor vacio?</div>
+                            <div class="flow-branches">
+                                <div class="flow-branch">
+                                    <div class="flow-arrow">Si &darr;</div>
+                                    <div class="flow-box">Saltar atributo</div>
+                                </div>
+                                <div class="flow-branch">
+                                    <div class="flow-arrow">No &darr;</div>
+                                    <div class="flow-box">Ejecutar reglas (Validations)</div>
+                                    <div class="flow-arrow">&darr;</div>
+                                    <div class="flow-box">Acumular errores</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-decision">&iquest;Hay errores acumulados?</div>
+                    <div class="flow-branches">
+                        <div class="flow-branch">
+                            <div class="flow-arrow">Si &darr;</div>
+                            <div class="flow-box flow-error">Devolver Array&lt;string&gt;</div>
+                        </div>
+                        <div class="flow-branch">
+                            <div class="flow-arrow">No &darr;</div>
+                            <div class="flow-box flow-end">Devolver true</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Comparar con resultadoEsperado</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box flow-end">Render modal: resumen por accion + boton "Ver detalle"</div>
+                </div>
+            </div>
+
+            <div class="api-class">
+                <h3>Flujo de Validaciones Atomicas</h3>
+                <p>Cada validacion atomica recibe el id del elemento HTML y devuelve un booleano (o string si es <code>personalized</code>).</p>
+                <div class="flowchart">
+                    <div class="flow-box flow-start">Validations[metodo](elementId, param)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-decision">Tipo de validacion</div>
+                    <table class="flow-method-table">
+                        <thead>
+                            <tr><th>Metodo</th><th>Logica</th><th>Devuelve</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>min_size</td><td>value.length &gt;= param</td><td>boolean</td></tr>
+                            <tr><td>max_size</td><td>value.length &lt;= param</td><td>boolean</td></tr>
+                            <tr><td>format</td><td>RegExp(param).test(value)</td><td>boolean</td></tr>
+                            <tr><td>no_file</td><td>el.files.length &gt; 0</td><td>boolean</td></tr>
+                            <tr><td>format_name_file</td><td>RegExp(param).test(file.name)</td><td>boolean</td></tr>
+                            <tr><td>type_file</td><td>param.indexOf(file.type) !== -1</td><td>boolean</td></tr>
+                            <tr><td>max_size_file</td><td>file.size &lt;= param</td><td>boolean</td></tr>
+                            <tr><td>personalized</td><td>entityInstance[attr + "_personalized_validation"](value, allValues)</td><td>boolean | string</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="api-class">
+                <h3>Flujo de una Prueba Individual</h3>
+                <p>Ciclo de una prueba: lectura, creacion del campo, ejecucion de validaciones y comparacion.</p>
+                <div class="flowchart">
+                    <div class="flow-box flow-start">Array de pruebas</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Extraer (campo, accion, valor, resultadoEsperado)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">createField(attrName, attrDef, accion) + setValue(...)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Iterar validaciones de la accion</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">executeValidation(...)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-decision">&iquest;Resultado?</div>
+                    <div class="flow-branches">
+                        <div class="flow-branch">
+                            <div class="flow-arrow">true</div>
+                            <div class="flow-box">Siguiente regla</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box">Devolver true</div>
+                        </div>
+                        <div class="flow-branch">
+                            <div class="flow-arrow">false / string</div>
+                            <div class="flow-box flow-error">Devolver codigo de error</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Comparar con resultadoEsperado</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box flow-end">EXITO / ERROR</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </main>
+
+    <footer id="footer_page">
+        <div class="footer-content">
+            <p>Interfaces de Usuario - Curso 2025-2026</p>
+            <p>Entrega Julio - Alberto Andres Faublak Alvarez</p>
+        </div>
+    </footer>
+
+</body>
+</html>
