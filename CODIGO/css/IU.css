@@ -508,6 +508,28 @@ tbody tr:hover {
     max-width: 280px;
 }
 
+/* La columna de valores de la tabla de detalle puede ser muy grande
+   (objetos con muchos atributos, cadenas largas, etc). La compactamos
+   con white-space pre-wrap y un max-width para que la tabla quepa en
+   la ventana sin tener que desplazar lateralmente todo el contenido. */
+.cell-values {
+    max-width: 360px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--text);
+}
+
+table.table-details {
+    table-layout: auto;
+}
+
+table.table-details td {
+    vertical-align: top;
+}
+
 .error-list {
     margin: 0;
     padding-left: 1.2rem;

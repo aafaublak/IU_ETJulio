@@ -1,10 +1,121 @@
+/**
+ * Clase Gestor
+ *
+ * Punto de entrada cuando el usuario pulsa una opcion del menu de
+ * entidades. Sus responsabilidades son:
+ *   - Cargar dinamicamente los ficheros JS de la entidad (asi no
+ *     hace falta declararlos uno a uno en el head del index.html).
+ *   - Comprobar que existen las variables y clases necesarias.
+ *   - Mostrar la ventana modal de error si falta alguna, o los
+ *     botones de "Test de Atributos" y "Test de Formulario" si todo
+ *     esta correcto.
+ *
+ * El fichero nombreentidad_Class.js es opcional (solo se necesita si
+ * la entidad tiene validaciones personalizadas) y el fichero
+ * nombreentidad_TestSubmit.js tambien lo es (TestSubmit es capaz de
+ * generar las pruebas a partir de las pruebas de atributo).
+ */
 class Gestor {
+
     constructor() {
         this.currentEntity = null;
     }
 
+    /**
+     * Selecciona una entidad. Si los ficheros no estan cargados,
+     * los carga dinamicamente y, una vez disponibles, lanza la
+     * comprobacion de variables/clases.
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @returns {void}
+     */
     seleccionarEntidad(entityName) {
         this.currentEntity = entityName;
+        var self = this;
+
+        this.loadEntityFiles(entityName, function() {
+            self.comprobarYMostrar(entityName);
+        });
+    }
+
+    /**
+     * Lanza la carga de los ficheros asociados a la entidad si no
+     * han sido cargados antes. Acepta que los ficheros opcionales
+     * fallen sin abortar el proceso.
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @param {Function} done callback que se invoca al terminar.
+     * @returns {void}
+     */
+    loadEntityFiles(entityName, done) {
+        var ficheros = [
+            { url: "./js/entities/" + entityName + "_estructura.js", optional: false },
+            { url: "./js/tests/" + entityName + "_tests.js", optional: false },
+            { url: "./js/tests/" + entityName + "_TestSubmit.js", optional: true },
+            { url: "./js/classes/" + entityName + "_Class.js", optional: true }
+        ];
+
+        var pendientes = ficheros.length;
+        if (pendientes === 0) { done(); return; }
+
+        ficheros.forEach(function(f) {
+            Gestor.loadScript(f.url, function() {
+                pendientes--;
+                if (pendientes === 0) done();
+            });
+        });
+    }
+
+    /**
+     * Anade dinamicamente al head un script con la url indicada.
+     * Si el script ya se anadio antes no se vuelve a anadir.
+     *
+     * @param {string} url ruta del fichero JS.
+     * @param {Function} done callback que se invoca tanto si carga
+     *                        bien como si falla (404, etc).
+     * @returns {void}
+     */
+    static loadScript(url, done) {
+        if (!Gestor._scriptsCargados) Gestor._scriptsCargados = {};
+        if (Gestor._scriptsCargados[url] === "loaded") { done(); return; }
+        if (Gestor._scriptsCargados[url] === "loading") {
+            var prev = Gestor._scriptsCargadosCallbacks[url] || [];
+            prev.push(done);
+            Gestor._scriptsCargadosCallbacks[url] = prev;
+            return;
+        }
+
+        if (!Gestor._scriptsCargadosCallbacks) Gestor._scriptsCargadosCallbacks = {};
+        Gestor._scriptsCargados[url] = "loading";
+        Gestor._scriptsCargadosCallbacks[url] = [done];
+
+        var s = document.createElement("script");
+        s.type = "text/javascript";
+        s.src = url;
+        s.async = false;
+        s.onload = function() {
+            Gestor._scriptsCargados[url] = "loaded";
+            var callbacks = Gestor._scriptsCargadosCallbacks[url] || [];
+            Gestor._scriptsCargadosCallbacks[url] = [];
+            callbacks.forEach(function(cb) { cb(); });
+        };
+        s.onerror = function() {
+            Gestor._scriptsCargados[url] = "error";
+            var callbacks = Gestor._scriptsCargadosCallbacks[url] || [];
+            Gestor._scriptsCargadosCallbacks[url] = [];
+            callbacks.forEach(function(cb) { cb(); });
+        };
+        document.head.appendChild(s);
+    }
+
+    /**
+     * Una vez cargados los ficheros, verifica las variables y
+     * actua en consecuencia (modal de error o botones de test).
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @returns {boolean} true si todo correcto, false si hay errores.
+     */
+    comprobarYMostrar(entityName) {
         var errors = [];
 
         if (typeof window[entityName + "_estructura"] === "undefined") {
@@ -17,11 +128,17 @@ class Gestor {
             errors.push("No se encontro la variable '" + entityName + "_pruebas' (fichero " + entityName + "_tests.js).");
         }
         if (typeof window[entityName + "_TestSubmit"] === "undefined") {
-            errors.push("No se encontro la variable '" + entityName + "_TestSubmit' (fichero " + entityName + "_TestSubmit.js).");
+            errors.push("No se encontro la variable '" + entityName + "_TestSubmit' (fichero " + entityName + "_TestSubmit.js). Se generara automaticamente a partir de las pruebas de atributo.");
         }
 
-        if (errors.length > 0) {
-            this.showErrorModal(errors);
+        var bloqueantes = errors.filter(function(e) {
+            return e.indexOf("_estructura") !== -1 ||
+                   e.indexOf("_def_tests") !== -1 ||
+                   e.indexOf("_pruebas") !== -1;
+        });
+
+        if (bloqueantes.length > 0) {
+            this.showErrorModal(bloqueantes);
             this.hideTestButtons();
             return false;
         }
@@ -30,6 +147,12 @@ class Gestor {
         return true;
     }
 
+    /**
+     * Muestra una ventana modal con los errores indicados.
+     *
+     * @param {string[]} errors lista de mensajes de error.
+     * @returns {void}
+     */
     showErrorModal(errors) {
         var overlay = document.getElementById("modal_overlay");
         var modal = document.getElementById("error_modal");
@@ -51,6 +174,13 @@ class Gestor {
         modal.hidden = false;
     }
 
+    /**
+     * Pinta los botones "Test de Atributos", "Test de Formulario" y
+     * "Volver al Inicio" en la zona de trabajo.
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @returns {void}
+     */
     showTestButtons(entityName) {
         var workArea = document.getElementById("work-area");
         if (!workArea) return;
@@ -102,6 +232,11 @@ class Gestor {
         workArea.appendChild(btnBack);
     }
 
+    /**
+     * Vuelve a mostrar la pantalla de bienvenida.
+     *
+     * @returns {void}
+     */
     hideTestButtons() {
         var workArea = document.getElementById("work-area");
         if (workArea) {

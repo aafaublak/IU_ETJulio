@@ -1,9 +1,32 @@
+/**
+ * Clase ValidateFieldsForm
+ *
+ * Crea los campos HTML individuales necesarios para probar cada
+ * atributo, los rellena con valores y lanza la validacion atomica
+ * correspondiente apoyandose en la clase Validations.
+ *
+ * Los campos se generan dentro de un contenedor oculto del DOM
+ * (_test_fields_container_) para que las pruebas tengan elementos
+ * reales sobre los que actuar sin contaminar la pagina visible.
+ */
 class ValidateFieldsForm {
+
     constructor() {
         this.validations = new Validations();
         this.container = null;
     }
 
+    /**
+     * Crea el elemento HTML que representa un atributo segun su
+     * definicion. Si el atributo es de tipo fichero pero la accion
+     * actual no usa validaciones de fichero (no_file, type_file...)
+     * se crea como un input de texto para poder rellenar el nombre.
+     *
+     * @param {string} attrName nombre del atributo (sera el id del elemento).
+     * @param {object} attrDef definicion del atributo.
+     * @param {string} action accion en curso (ADD, EDIT, SEARCH).
+     * @returns {HTMLElement} elemento HTML creado.
+     */
     createField(attrName, attrDef, action) {
         var htmlDef = attrDef.html || {};
         var element;
@@ -74,6 +97,16 @@ class ValidateFieldsForm {
         return element;
     }
 
+    /**
+     * Asigna un valor al elemento HTML segun su tipo. Para campos
+     * file se construye un File "falso" usando DataTransfer para
+     * poder simular un fichero subido.
+     *
+     * @param {HTMLElement} element elemento al que asignar el valor.
+     * @param {*} value valor a asignar (string, number, boolean...).
+     * @param {object} [fileData] datos del fichero {name, type, size}.
+     * @returns {void}
+     */
     setValue(element, value, fileData) {
         if (element.type === "file" && fileData && typeof fileData === "object") {
             var mockFile = new File(
@@ -128,6 +161,18 @@ class ValidateFieldsForm {
         element.value = value !== undefined && value !== null ? String(value) : "";
     }
 
+    /**
+     * Lanza la validacion atomica correspondiente apoyandose en la
+     * clase Validations.
+     *
+     * @param {string} validationType tipo de validacion (min_size, max_size, format...).
+     * @param {string} elementId id del elemento HTML.
+     * @param {*} param parametro de la validacion (cuando proceda).
+     * @param {object} [entityInstance] instancia de la clase de la entidad.
+     * @param {string} [attrName] nombre del atributo.
+     * @param {object} [allValues] valores de los demas atributos del formulario.
+     * @returns {boolean|string} true si pasa la validacion, false o string si falla.
+     */
     executeValidation(validationType, elementId, param, entityInstance, attrName, allValues) {
         if (validationType === "personalized") {
             return this.validations.personalized(elementId, entityInstance, attrName, allValues);
@@ -140,6 +185,12 @@ class ValidateFieldsForm {
         return true;
     }
 
+    /**
+     * Crea un contenedor oculto en el DOM donde se anaden los
+     * campos de prueba. Si ya existia uno anterior, se elimina.
+     *
+     * @returns {HTMLElement} el contenedor creado.
+     */
     createTestContainer() {
         var existing = document.getElementById("_test_fields_container_");
         if (existing) existing.remove();
@@ -151,6 +202,12 @@ class ValidateFieldsForm {
         return this.container;
     }
 
+    /**
+     * Elimina del DOM el contenedor de pruebas para no dejar
+     * elementos sueltos despues de ejecutar las validaciones.
+     *
+     * @returns {void}
+     */
     cleanup() {
         if (this.container) {
             this.container.remove();

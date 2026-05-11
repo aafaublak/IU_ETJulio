@@ -11,20 +11,15 @@
     <script type="text/javascript" src="./js/data/menu_entidades.js"></script>
     <script type="text/javascript" src="./js/data/Julio_Datos_AlbertoAndresFaublakAlvarez.js"></script>
 
-    <script type="text/javascript" src="./js/entities/analysis_preparation_estructura.js"></script>
-    <script type="text/javascript" src="./js/entities/characteristic_estructura.js"></script>
-    <script type="text/javascript" src="./js/entities/project_estructura.js"></script>
-
-    <script type="text/javascript" src="./js/classes/project_Class.js"></script>
-
-    <script type="text/javascript" src="./js/tests/analysis_preparation_tests.js"></script>
-    <script type="text/javascript" src="./js/tests/characteristic_tests.js"></script>
-    <script type="text/javascript" src="./js/tests/project_tests.js"></script>
-
-    <script type="text/javascript" src="./js/tests/analysis_preparation_TestSubmit.js"></script>
-    <script type="text/javascript" src="./js/tests/characteristic_TestSubmit.js"></script>
-    <script type="text/javascript" src="./js/tests/project_TestSubmit.js"></script>
-
+    <!--
+        Las clases del nucleo (Validations, ValidateFieldsForm, Gestor,
+        TestForm y TestSubmit) si se cargan aqui porque son las que
+        orquestan todo. Los ficheros propios de cada entidad
+        (_estructura.js, _tests.js, _TestSubmit.js y _Class.js) se
+        cargan dinamicamente desde Gestor cuando el usuario pulsa la
+        opcion correspondiente en el menu, asi no hace falta listar
+        uno a uno los ficheros de cada nueva entidad en este HTML.
+    -->
     <script type="text/javascript" src="./js/classes/Validations_Class.js"></script>
     <script type="text/javascript" src="./js/classes/ValidateFieldsForm_Class.js"></script>
     <script type="text/javascript" src="./js/classes/Gestor_Class.js"></script>

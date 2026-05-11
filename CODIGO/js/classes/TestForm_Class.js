@@ -1,4 +1,21 @@
+/**
+ * Clase TestForm
+ *
+ * Encargada de ejecutar las pruebas a nivel de atributo de una
+ * entidad. Crea una ventana modal con tres bloques:
+ *   1. Informacion sobre la estructura de la entidad.
+ *   2. Informacion sobre la definicion de tests.
+ *   3. Informacion sobre las pruebas (resumen y boton para ver detalle).
+ *
+ * Para ejecutar cada prueba se apoya en ValidateFieldsForm, que crea
+ * los elementos HTML del atributo, los rellena con el valor de la
+ * prueba y lanza la validacion atomica correspondiente.
+ */
 class TestForm {
+
+    /**
+     * @param {string} entityName nombre de la entidad a probar.
+     */
     constructor(entityName) {
         this.entityName = entityName;
         this.estructura = window[entityName + "_estructura"];
@@ -17,6 +34,12 @@ class TestForm {
         }
     }
 
+    /**
+     * Ejecuta todo el ciclo de tests (estructura, def_tests y
+     * pruebas) y abre el modal con el resumen.
+     *
+     * @returns {void}
+     */
     run() {
         var structureInfo = this.checkStructure();
         var defTestsInfo = this.checkDefTests();
@@ -36,6 +59,12 @@ class TestForm {
         overlay.hidden = false;
     }
 
+    /**
+     * Pinta en el modal el resumen completo (estructura + def_tests
+     * + pruebas) y enlaza el boton "Ver detalle de cada prueba".
+     *
+     * @returns {void}
+     */
     renderSummary() {
         var body = document.getElementById("result_modal_body");
         if (!body) return;
@@ -53,6 +82,12 @@ class TestForm {
         }
     }
 
+    /**
+     * Pinta en el modal el detalle prueba a prueba con el resultado
+     * esperado, el obtenido y el indicador visual de EXITO/ERROR.
+     *
+     * @returns {void}
+     */
     renderDetails() {
         var body = document.getElementById("result_modal_body");
         if (!body) return;
@@ -68,6 +103,11 @@ class TestForm {
         }
     }
 
+    /**
+     * Comprueba que la estructura de la entidad este bien formada.
+     *
+     * @returns {{isCorrect: boolean, errors: string[], attributes: object[]}}
+     */
     checkStructure() {
         var result = { isCorrect: true, errors: [], attributes: [] };
 
@@ -125,6 +165,13 @@ class TestForm {
         return result;
     }
 
+    /**
+     * Recorre las definiciones de test y comprueba que cada una
+     * tenga los 8 campos con sus tipos correctos. Cuenta tambien
+     * cuantas definiciones hay por atributo.
+     *
+     * @returns {{total: number, wellDefined: number, byAttribute: object, details: object[]}}
+     */
     checkDefTests() {
         var result = { total: 0, wellDefined: 0, byAttribute: {}, details: [] };
 
@@ -174,6 +221,14 @@ class TestForm {
         return result;
     }
 
+    /**
+     * Ejecuta todas las pruebas definidas en nombreentidad_pruebas
+     * comparando el resultado obtenido con el esperado y agrupando
+     * por def_test para mostrar cuantas pruebas de error/exito hay.
+     *
+     * @returns {object} resumen con total, wellDefined, withErrorExpected,
+     *                   withSuccessExpected, passed, failed y details.
+     */
     runPruebas() {
         var result = {
             total: 0,
@@ -252,6 +307,17 @@ class TestForm {
         return result;
     }
 
+    /**
+     * Lanza las validaciones definidas para la accion sobre el
+     * campo indicado y devuelve true o el codigo de error.
+     *
+     * @param {string} campo nombre del atributo.
+     * @param {object} attrDef definicion del atributo.
+     * @param {string} accion accion en curso (ADD, EDIT, SEARCH).
+     * @param {*} valoresAtributos valor o objeto con multiples valores.
+     * @param {number} numDefTest numero de definicion de test asociada.
+     * @returns {boolean|string} true si pasa o el codigo de error.
+     */
     executePrueba(campo, attrDef, accion, valoresAtributos, numDefTest) {
         var validationsForAction = attrDef.validations[accion];
         if (!validationsForAction) return true;
@@ -331,6 +397,62 @@ class TestForm {
         return true;
     }
 
+    /**
+     * Convierte un valor para mostrarlo en la celda de la tabla de
+     * detalle. Las cadenas largas con caracteres repetidos se
+     * comprimen como "X".repeat(N) para que la tabla quepa sin
+     * tener que desplazar horizontalmente.
+     *
+     * @param {*} value valor a formatear.
+     * @returns {string} representacion compacta.
+     */
+    formatValueForCell(value) {
+        var self = this;
+        if (value === null || value === undefined) return "";
+        if (typeof value === "string") return this.compactString(value);
+        if (typeof value === "number" || typeof value === "boolean") return String(value);
+
+        if (typeof value === "object") {
+            if (Array.isArray(value)) {
+                return "[" + value.map(function(v) { return self.formatValueForCell(v); }).join(", ") + "]";
+            }
+            var parts = [];
+            Object.keys(value).forEach(function(k) {
+                parts.push(k + ": " + self.formatValueForCell(value[k]));
+            });
+            return "{ " + parts.join(", ") + " }";
+        }
+        return String(value);
+    }
+
+    /**
+     * Si la cadena consiste en el mismo caracter repetido >=20
+     * veces, devuelve la notacion "X".repeat(N); en otro caso
+     * devuelve la cadena entre comillas.
+     *
+     * @param {string} str cadena a comprimir.
+     * @returns {string} cadena para mostrar.
+     */
+    compactString(str) {
+        if (str.length >= 20) {
+            var first = str.charAt(0);
+            var allEqual = true;
+            for (var i = 1; i < str.length; i++) {
+                if (str.charAt(i) !== first) { allEqual = false; break; }
+            }
+            if (allEqual) {
+                return '"' + first + '".repeat(' + str.length + ')';
+            }
+        }
+        return '"' + str + '"';
+    }
+
+    /**
+     * Construye el HTML de la seccion de estructura.
+     *
+     * @param {object} info resumen de la estructura.
+     * @returns {string} HTML.
+     */
     buildStructureSection(info) {
         var html = '<div class="section">';
         html += '<h2>Informacion sobre la Estructura de la Entidad</h2>';
@@ -361,6 +483,12 @@ class TestForm {
         return html;
     }
 
+    /**
+     * Construye el HTML de la seccion de definiciones de test.
+     *
+     * @param {object} info resumen de las definiciones.
+     * @returns {string} HTML.
+     */
     buildDefTestsSection(info) {
         var html = '<div class="section">';
         html += '<h2>Informacion sobre las Definiciones de Test</h2>';
@@ -404,6 +532,12 @@ class TestForm {
         return html;
     }
 
+    /**
+     * Construye el HTML de la seccion de pruebas (resumen y boton).
+     *
+     * @param {object} info resumen de las pruebas.
+     * @returns {string} HTML.
+     */
     buildPruebasSection(info) {
         var html = '<div class="section">';
         html += '<h2>Informacion sobre las Pruebas</h2>';
@@ -443,7 +577,18 @@ class TestForm {
         return html;
     }
 
+    /**
+     * Construye el HTML de la tabla de detalle prueba a prueba.
+     * Para que la tabla no sea excesivamente ancha, los valores se
+     * compactan con formatValueForCell (cadenas repetidas pasan a
+     * usar la notacion repeat()) y la columna se muestra con
+     * white-space en CSS para envolver el texto.
+     *
+     * @param {object} pruebasInfo resumen de pruebas.
+     * @returns {string} HTML.
+     */
     buildDetailsHTML(pruebasInfo) {
+        var self = this;
         var html = '<div class="detail-back-row">';
         html += '<button class="btn btn-warning" id="btn_volver_resumen_pruebas">';
         html += '<img src="./iconos/BACK.png" alt="" class="btn-icon-img"> Volver al Resumen';
@@ -451,7 +596,7 @@ class TestForm {
 
         html += '<div class="section">';
         html += '<h2>Detalle de Pruebas - ' + this.entityName + '</h2>';
-        html += '<table><thead><tr><th>#</th><th>Entidad</th><th>Campo</th><th>Num Def</th><th>Num Prueba</th><th>Accion</th><th>Valores</th><th>Resultado Esperado</th><th>Resultado Obtenido</th><th>Estado</th></tr></thead><tbody>';
+        html += '<table class="table-details"><thead><tr><th>#</th><th>Entidad</th><th>Campo</th><th>Num Def</th><th>Num Prueba</th><th>Accion</th><th>Valores</th><th>Resultado Esperado</th><th>Resultado Obtenido</th><th>Estado</th></tr></thead><tbody>';
 
         pruebasInfo.details.forEach(function(p, i) {
             var d = p.data || [];
@@ -462,9 +607,9 @@ class TestForm {
             html += '<td>' + (d[2] !== undefined ? d[2] : '') + '</td>';
             html += '<td>' + (d[3] !== undefined ? d[3] : '') + '</td>';
             html += '<td>' + (d[4] || '') + '</td>';
-            html += '<td>' + JSON.stringify(d[5]) + '</td>';
-            html += '<td>' + JSON.stringify(d[6]) + '</td>';
-            html += '<td>' + JSON.stringify(p.resultObtained) + '</td>';
+            html += '<td class="cell-values">' + self.formatValueForCell(d[5]) + '</td>';
+            html += '<td>' + self.formatValueForCell(d[6]) + '</td>';
+            html += '<td>' + self.formatValueForCell(p.resultObtained) + '</td>';
             html += '<td class="' + (p.passed ? 'td-ok' : 'td-ko') + '">' + (p.passed ? 'EXITO' : 'ERROR') + '</td>';
             html += '</tr>';
         });

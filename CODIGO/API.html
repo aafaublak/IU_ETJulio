@@ -30,11 +30,35 @@
 
             <div class="api-class" id="class-Validations">
                 <h3>Validations <code>Validations_Class.js</code></h3>
-                <p>Clase que contiene todas las validaciones atomicas sobre atributos de formulario. Cada metodo recibe el ID del elemento HTML a validar.</p>
+                <p>Clase que contiene todas las validaciones atomicas sobre atributos de formulario. Cada metodo recibe el ID del elemento HTML a validar (tal como pide el enunciado) y se encarga el mismo de leer el valor del DOM.</p>
+
+                <div class="api-method">
+                    <strong>readValue(elementId)</strong>
+                    <p>Devuelve el valor textual del elemento HTML segun su tipo. Para inputs file devuelve el nombre del fichero seleccionado o cadena vacia; para checkbox devuelve "true"/""; para grupos radio devuelve el value del radio marcado.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del elemento HTML.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string|null</code> &mdash; cadena con el valor o <code>null</code> si el elemento no existe.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>readFile(elementId)</strong>
+                    <p>Devuelve el primer <code>File</code> seleccionado en un input type=file. Lo utilizan internamente las validaciones de fichero (<code>no_file</code>, <code>format_name_file</code>, <code>type_file</code>, <code>max_size_file</code>) para no leer el DOM de varias formas distintas.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del input file.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>File|null</code> &mdash; fichero seleccionado o <code>null</code> si no hay.</p>
+                </div>
 
                 <div class="api-method">
                     <strong>min_size(elementId, minSize)</strong>
-                    <p>Valida que el valor del elemento tenga al menos <code>minSize</code> caracteres.</p>
+                    <p>Valida que el valor del elemento tenga al menos <code>minSize</code> caracteres. Si el elemento no existe en el DOM devuelve <code>false</code> (la validacion no se ha podido realizar).</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -47,7 +71,7 @@
 
                 <div class="api-method">
                     <strong>max_size(elementId, maxSize)</strong>
-                    <p>Valida que el valor del elemento no exceda <code>maxSize</code> caracteres.</p>
+                    <p>Valida que el valor del elemento no exceda <code>maxSize</code> caracteres. Si el elemento no existe en el DOM devuelve <code>false</code>.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -60,7 +84,7 @@
 
                 <div class="api-method">
                     <strong>format(elementId, regexpStr)</strong>
-                    <p>Valida que el valor del elemento cumpla con la expresion regular proporcionada.</p>
+                    <p>Valida que el valor del elemento (leido con <code>readValue</code>) case con la expresion regular indicada. Si el elemento no existe en el DOM o la expresion regular no es una cadena no vacia, devuelve <code>false</code> porque la validacion no se ha podido aplicar.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -68,12 +92,24 @@
                             <tr><td>regexpStr</td><td>string</td><td>Expresion regular como cadena</td></tr>
                         </tbody>
                     </table>
-                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el valor cumple con el formato</p>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el valor cumple el formato.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>date(elementId)</strong>
+                    <p>Valida que el valor del elemento sea una fecha real en formato <code>dd/mm/aaaa</code>. No basta con que case el regex, ademas comprueba dias por mes y anos bisiestos (por ejemplo <code>31/02/2024</code> no es valida).</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>elementId</td><td>string</td><td>ID del elemento HTML.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si la fecha existe en el calendario.</p>
                 </div>
 
                 <div class="api-method">
                     <strong>no_file(elementId)</strong>
-                    <p>Verifica que un input file tenga un archivo seleccionado.</p>
+                    <p>Verifica que un input file tenga un archivo seleccionado (usa <code>readFile</code> internamente).</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -85,7 +121,7 @@
 
                 <div class="api-method">
                     <strong>format_name_file(elementId, regexpStr)</strong>
-                    <p>Valida el formato del nombre del archivo seleccionado.</p>
+                    <p>Valida el formato del nombre del archivo seleccionado (lee el fichero con <code>readFile</code>). Si no hay fichero o la expresion regular no es valida devuelve <code>false</code>.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -124,7 +160,7 @@
 
                 <div class="api-method">
                     <strong>personalized(elementId, entityInstance, attrName, allValues)</strong>
-                    <p>Ejecuta una validacion personalizada definida en la clase de la entidad.</p>
+                    <p>Ejecuta una validacion personalizada definida en la clase de la entidad. Invoca el metodo <code>nombreAtributo_personalized_validation(value, allValues)</code> sobre <code>entityInstance</code>.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -200,19 +236,44 @@
 
             <div class="api-class" id="class-project">
                 <h3>project <code>project_Class.js</code></h3>
-                <p>Clase de la entidad <code>project</code>. Contiene las validaciones personalizadas declaradas con <code>personalize: true</code> en la estructura, una por cada atributo personalizado.</p>
+                <p>Clase de la entidad <code>project</code>. Solo existe porque la entidad necesita validaciones personalizadas: comprobar que las fechas de inicio y fin son fechas reales (no basta con que casen el regex de formato) y, para la fecha de fin, comprobar ademas que es posterior a la de inicio. Si una entidad no tiene validaciones personalizadas no necesita tener clase.</p>
 
                 <div class="api-method">
-                    <strong>end_date_project_personalized_validation(endDateValue, allValues)</strong>
-                    <p>Valida que la fecha de fin del proyecto sea posterior a la fecha de inicio.</p>
+                    <strong>parseDate(str)</strong>
+                    <p>Metodo auxiliar interno. Convierte una cadena <code>dd/mm/aaaa</code> en un objeto <code>Date</code> solo si la fecha existe realmente en el calendario (controla dias por mes y anos bisiestos).</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
-                            <tr><td>endDateValue</td><td>string</td><td>Valor de la fecha de fin en formato dd/mm/aaaa.</td></tr>
-                            <tr><td>allValues</td><td>object</td><td>Objeto con todos los valores del formulario; debe incluir <code>start_date_project</code>.</td></tr>
+                            <tr><td>str</td><td>string</td><td>Cadena con la fecha.</td></tr>
                         </tbody>
                     </table>
-                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si la fecha de fin es mayor que la de inicio, o el codigo de error <code>end_date_project_personalized_KO</code> en caso contrario.</p>
+                    <p><strong>Retorna:</strong> <code>Date|null</code> &mdash; objeto <code>Date</code> o <code>null</code> si la cadena no es una fecha real.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>start_date_project_personalized_validation(value, allValues)</strong>
+                    <p>Validacion personalizada para <code>start_date_project</code>. Comprueba que la cadena indicada corresponde a una fecha real (por ejemplo <code>31/02/2024</code> no es valida aunque cumpla el formato).</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>value</td><td>string</td><td>Valor de la fecha de inicio en formato dd/mm/aaaa.</td></tr>
+                            <tr><td>allValues</td><td>object</td><td>Resto de valores del formulario (no se usa en esta validacion).</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si la fecha existe, o <code>start_date_project_personalized_KO</code> en caso contrario.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>end_date_project_personalized_validation(value, allValues)</strong>
+                    <p>Validacion personalizada para <code>end_date_project</code>. Comprueba dos cosas: que la fecha sea real y, si esta presente <code>start_date_project</code>, que la fecha de fin sea posterior a la de inicio.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>value</td><td>string</td><td>Valor de la fecha de fin en formato dd/mm/aaaa.</td></tr>
+                            <tr><td>allValues</td><td>object</td><td>Resto de valores del formulario; se espera <code>start_date_project</code>.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si valida, o <code>end_date_project_personalized_KO</code>.</p>
                 </div>
             </div>
         </div>
@@ -289,18 +350,54 @@
 
             <div class="api-class" id="class-Gestor">
                 <h3>Gestor <code>Gestor_Class.js</code></h3>
-                <p>Clase que gestiona la seleccion de entidades y comprueba que existan todos los ficheros/variables necesarios.</p>
+                <p>Punto de entrada cuando el usuario pulsa una opcion del menu. Carga dinamicamente los ficheros JS asociados a la entidad (estructura, tests, TestSubmit y la clase opcional) anadiendo <code>&lt;script&gt;</code> en el <code>&lt;head&gt;</code>, comprueba que existen las variables necesarias y muestra los botones de test o el modal de error.</p>
 
                 <div class="api-method">
                     <strong>seleccionarEntidad(entityName)</strong>
-                    <p>Selecciona una entidad, verifica las variables requeridas y muestra los botones de test.</p>
+                    <p>Lanza la carga dinamica de los ficheros de la entidad y, una vez disponibles, realiza la comprobacion de variables y pinta los botones de test.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
                             <tr><td>entityName</td><td>string</td><td>Nombre de la entidad</td></tr>
                         </tbody>
                     </table>
-                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si todas las variables existen, false si hay errores</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>loadEntityFiles(entityName, done)</strong>
+                    <p>Lanza la carga de los cuatro ficheros asociados a la entidad. <code>nombreentidad_estructura.js</code> y <code>nombreentidad_tests.js</code> son obligatorios; <code>nombreentidad_TestSubmit.js</code> y <code>nombreentidad_Class.js</code> son opcionales (si faltan no se aborta el proceso).</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad.</td></tr>
+                            <tr><td>done</td><td>Function</td><td>Callback que se invoca cuando todos los ficheros han terminado.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>static loadScript(url, done)</strong>
+                    <p>Anade dinamicamente al head un script con la url indicada, evitando volver a anadirlo si ya estaba cargado y agrupando callbacks si llegan varias peticiones para la misma url.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>url</td><td>string</td><td>Ruta del fichero JS.</td></tr>
+                            <tr><td>done</td><td>Function</td><td>Callback (tanto en exito como en error).</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>comprobarYMostrar(entityName)</strong>
+                    <p>Verifica que existen las variables <code>_estructura</code>, <code>_def_tests</code>, <code>_pruebas</code> y <code>_TestSubmit</code> y actua en consecuencia: pinta los botones o abre el modal de error. La ausencia de <code>_TestSubmit</code> no se considera bloqueante porque <code>TestSubmit</code> es capaz de generar las pruebas a partir de las pruebas de atributo.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; <code>true</code> si todo correcto.</p>
                 </div>
 
                 <div class="api-method">
@@ -337,16 +434,23 @@
 
             <div class="api-class" id="class-TestSubmit">
                 <h3>TestSubmit <code>TestSubmit_Class.js</code></h3>
-                <p>Clase que ejecuta las pruebas de submit del formulario. Verifica todos los atributos para cada accion (ADD, EDIT, SEARCH) sin realizar peticiones al backend.</p>
+                <p>Clase que ejecuta las pruebas de submit del formulario. Verifica todos los atributos para cada accion (ADD, EDIT, SEARCH) sin realizar peticiones al backend. Si el fichero <code>nombreentidad_TestSubmit.js</code> no esta presente, la clase es capaz de <strong>generar las pruebas de submit automaticamente</strong> a partir de las pruebas de atributo (<code>nombreentidad_pruebas</code>): construye un "baseline" valido por accion y, para cada prueba, aplica los valores sobre ese baseline.</p>
 
                 <div class="api-method">
                     <strong>constructor(entityName)</strong>
+                    <p>Si <code>window[entityName + "_TestSubmit"]</code> no esta definido, llama a <code>generateTestSubmitFromPruebas()</code> y marca el flag <code>autoGenerated = true</code> (se indica visualmente en la ventana de resultados).</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
                             <tr><td>entityName</td><td>string</td><td>Nombre de la entidad a testear</td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>generateTestSubmitFromPruebas()</strong>
+                    <p>Construye las pruebas de submit a partir del array <code>nombreentidad_pruebas</code>. El proceso es: por cada accion se acumula un registro baseline con los valores validos disponibles en las pruebas con resultado esperado <code>true</code>; despues, por cada prueba (sea de exito o error), se crea una entrada que aplica los valores de la prueba sobre el baseline de su accion. De esta forma una sola "ventana de salida" cubre tambien las pruebas de submit sin necesidad de escribir el fichero.</p>
+                    <p><strong>Retorna:</strong> <code>Array</code> &mdash; mismo formato que <code>nombreentidad_TestSubmit</code>.</p>
                 </div>
 
                 <div class="api-method">
@@ -542,14 +646,17 @@
                             <tr><th>Metodo</th><th>Logica</th><th>Devuelve</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td>min_size</td><td>value.length &gt;= param</td><td>boolean</td></tr>
-                            <tr><td>max_size</td><td>value.length &lt;= param</td><td>boolean</td></tr>
-                            <tr><td>format</td><td>RegExp(param).test(value)</td><td>boolean</td></tr>
-                            <tr><td>no_file</td><td>el.files.length &gt; 0</td><td>boolean</td></tr>
-                            <tr><td>format_name_file</td><td>RegExp(param).test(file.name)</td><td>boolean</td></tr>
-                            <tr><td>type_file</td><td>param.indexOf(file.type) !== -1</td><td>boolean</td></tr>
-                            <tr><td>max_size_file</td><td>file.size &lt;= param</td><td>boolean</td></tr>
-                            <tr><td>personalized</td><td>entityInstance[attr + "_personalized_validation"](value, allValues)</td><td>boolean | string</td></tr>
+                            <tr><td>readValue</td><td>devuelve el value del elemento (o null si no existe)</td><td>string | null</td></tr>
+                            <tr><td>readFile</td><td>devuelve el File del input file (o null si no hay)</td><td>File | null</td></tr>
+                            <tr><td>min_size</td><td>readValue.length &gt;= param (false si no existe el elemento)</td><td>boolean</td></tr>
+                            <tr><td>max_size</td><td>readValue.length &lt;= param (false si no existe el elemento)</td><td>boolean</td></tr>
+                            <tr><td>format</td><td>RegExp(param).test(readValue) &mdash; false si no hay elemento o regex vacia</td><td>boolean</td></tr>
+                            <tr><td>date</td><td>parsea readValue como dd/mm/aaaa y comprueba que sea fecha real</td><td>boolean</td></tr>
+                            <tr><td>no_file</td><td>readFile !== null</td><td>boolean</td></tr>
+                            <tr><td>format_name_file</td><td>RegExp(param).test(readFile.name)</td><td>boolean</td></tr>
+                            <tr><td>type_file</td><td>param.indexOf(readFile.type) !== -1</td><td>boolean</td></tr>
+                            <tr><td>max_size_file</td><td>readFile.size &lt;= param</td><td>boolean</td></tr>
+                            <tr><td>personalized</td><td>entityInstance[attr + "_personalized_validation"](readValue, allValues)</td><td>boolean | string</td></tr>
                         </tbody>
                     </table>
                 </div>

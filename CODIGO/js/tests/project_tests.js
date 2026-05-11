@@ -169,7 +169,15 @@ var project_def_tests = [
     // === id_sampling_methodology - SEARCH ===
     ["project", "id_sampling_methodology", "input", 108, "Validar max_size id_sampling en SEARCH", "SEARCH", "id_sampling_methodology_max_size_KO", "ID metodologia demasiado largo en SEARCH"],
     ["project", "id_sampling_methodology", "input", 109, "Validar format id_sampling en SEARCH", "SEARCH", "id_sampling_methodology_format_KO", "ID metodologia con formato incorrecto en SEARCH"],
-    ["project", "id_sampling_methodology", "input", 110, "Validar id_sampling correcto en SEARCH", "SEARCH", true, "ID metodologia correcto en SEARCH"]
+    ["project", "id_sampling_methodology", "input", 110, "Validar id_sampling correcto en SEARCH", "SEARCH", true, "ID metodologia correcto en SEARCH"],
+
+    // === fechas - validacion personalizada de fecha real ===
+    // (se aprovecha que start_date y end_date tienen personalize: true para
+    //  comprobar que la fecha existe en el calendario, no solo que cumple el regex)
+    ["project", "start_date_project", "input", 111, "Validar personalized fecha real start_date en ADD (ej. 31/02/2024)", "ADD", "start_date_project_personalized_KO", "Fecha de inicio inexistente en el calendario"],
+    ["project", "start_date_project", "input", 112, "Validar personalized fecha real start_date en EDIT", "EDIT", "start_date_project_personalized_KO", "Fecha de inicio inexistente en el calendario EDIT"],
+    ["project", "end_date_project", "input", 113, "Validar personalized fecha real end_date en ADD (ej. 30/02/2024)", "ADD", "end_date_project_personalized_KO", "Fecha de fin inexistente en el calendario"],
+    ["project", "end_date_project", "input", 114, "Validar personalized fecha real end_date en EDIT", "EDIT", "end_date_project_personalized_KO", "Fecha de fin inexistente en el calendario EDIT"]
 ];
 
 var project_pruebas = [
@@ -343,5 +351,13 @@ var project_pruebas = [
     // === id_sampling SEARCH ===
     ["project", "id_sampling_methodology", 108, 108, "SEARCH", {"id_sampling_methodology": "1".repeat(12)}, "id_sampling_methodology_max_size_KO"],
     ["project", "id_sampling_methodology", 109, 109, "SEARCH", {"id_sampling_methodology": "abc"}, "id_sampling_methodology_format_KO"],
-    ["project", "id_sampling_methodology", 110, 110, "SEARCH", {"id_sampling_methodology": "3"}, true]
+    ["project", "id_sampling_methodology", 110, 110, "SEARCH", {"id_sampling_methodology": "3"}, true],
+
+    // === pruebas de validez real de fechas ===
+    // 31/02/2024 y 30/02/2024 pasan el regex pero NO existen en el calendario;
+    // la validacion personalizada (en project_Class.js) las rechaza.
+    ["project", "start_date_project", 111, 111, "ADD", {"start_date_project": "31/02/2024"}, "start_date_project_personalized_KO"],
+    ["project", "start_date_project", 112, 112, "EDIT", {"start_date_project": "29/02/2023"}, "start_date_project_personalized_KO"],
+    ["project", "end_date_project", 113, 113, "ADD", {"end_date_project": "30/02/2024", "start_date_project": "01/01/2024"}, "end_date_project_personalized_KO"],
+    ["project", "end_date_project", 114, 114, "EDIT", {"end_date_project": "31/04/2024", "start_date_project": "01/01/2024"}, "end_date_project_personalized_KO"]
 ];
