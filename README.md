@@ -108,12 +108,11 @@ Crea los elementos HTML necesarios para cada atributo, los rellena con los valor
 
 ## Validaciones personalizadas — entidad `project`
 
-La entidad `project` tiene una clase asociada (`project_Class.js`) porque necesita validaciones cruzadas entre atributos:
+La entidad `project` tiene una clase asociada (`project_Class.js`) porque `end_date_project` necesita una validación cruzada que la validación atómica `date()` no puede hacer: comprobar que la fecha de fin es posterior a la de inicio.
 
-- **`start_date_project_personalized_validation`**: comprueba que la fecha de inicio sea una fecha real del calendario (no solo que cumpla el formato `dd/mm/aaaa`).
-- **`end_date_project_personalized_validation`**: comprueba que la fecha de fin sea real y además sea posterior a la fecha de inicio.
+- **`end_date_project_personalized_validation`**: comprueba que la fecha de fin sea posterior a `start_date_project`. La validez de la fecha en sí (días por mes, bisiestos) la gestiona la validación atómica `date()` antes de llegar aquí.
 
-Ambas rechazan años fuera del rango 1900-2100 y detectan fechas imposibles como `31/02/2024` o `29/02/2023`.
+La validación atómica `date()` no impone ningún rango de años: acepta cualquier fecha de calendario real desde el año 1 en adelante.
 
 ---
 

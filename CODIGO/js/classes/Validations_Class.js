@@ -116,6 +116,7 @@ class Validations {
         var m = parseInt(match[2], 10);
         var y = parseInt(match[3], 10);
         var dateObj = new Date(y, m - 1, d);
+        if (y >= 0 && y <= 99) dateObj.setFullYear(y);
         return dateObj.getFullYear() === y &&
                (dateObj.getMonth() + 1) === m &&
                dateObj.getDate() === d;

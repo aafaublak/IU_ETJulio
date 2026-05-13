@@ -1,19 +1,11 @@
 /**
  * Clase Gestor
  *
- * Punto de entrada cuando el usuario pulsa una opcion del menu de
- * entidades. Sus responsabilidades son:
- *   - Cargar dinamicamente los ficheros JS de la entidad (asi no
- *     hace falta declararlos uno a uno en el head del index.html).
- *   - Comprobar que existen las variables y clases necesarias.
- *   - Mostrar la ventana modal de error si falta alguna, o los
- *     botones de "Test de Atributos" y "Test de Formulario" si todo
- *     esta correcto.
- *
- * El fichero nombreentidad_Class.js es opcional (solo se necesita si
- * la entidad tiene validaciones personalizadas) y el fichero
- * nombreentidad_TestSubmit.js tambien lo es (TestSubmit es capaz de
- * generar las pruebas a partir de las pruebas de atributo).
+ * Se encarga de cargar los ficheros de una entidad al seleccionarla
+ * en el menu (carga dinamica mediante script tags) y de comprobar que
+ * existen las variables necesarias antes de mostrar los botones de
+ * test. Si falta alguna variable bloqueante muestra un modal de error.
+ * Los ficheros _Class.js y _TestSubmit.js son opcionales.
  */
 class Gestor {
 

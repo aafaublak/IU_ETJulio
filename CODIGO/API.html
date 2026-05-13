@@ -97,7 +97,7 @@
 
                 <div class="api-method">
                     <strong>date(elementId)</strong>
-                    <p>Valida que el valor del elemento sea una fecha real en formato <code>dd/mm/aaaa</code>. No basta con que case el regex, ademas comprueba dias por mes y anos bisiestos (por ejemplo <code>31/02/2024</code> no es valida).</p>
+                    <p>Valida que el valor del elemento sea una fecha real en formato <code>dd/mm/aaaa</code>. Comprueba dias por mes, anos bisiestos y limites de cada mes sin restriccion de rango de anos (por ejemplo <code>31/02/2024</code> y <code>30/04/1800</code> no son validas). Se usa en la estructura de <code>project</code> para los campos <code>start_date_project</code> y <code>end_date_project</code> en ADD y EDIT.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -236,11 +236,11 @@
 
             <div class="api-class" id="class-project">
                 <h3>project <code>project_Class.js</code></h3>
-                <p>Clase de la entidad <code>project</code>. Solo existe porque la entidad necesita validaciones personalizadas: comprobar que las fechas de inicio y fin son fechas reales (no basta con que casen el regex de formato) y, para la fecha de fin, comprobar ademas que es posterior a la de inicio. Si una entidad no tiene validaciones personalizadas no necesita tener clase.</p>
+                <p>Clase de la entidad <code>project</code>. Existe porque <code>end_date_project</code> necesita una validacion cruzada con <code>start_date_project</code>: comprobar que la fecha de fin es posterior a la de inicio. La validez del formato y de la fecha en si (dias por mes, bisiestos) se resuelve con la validacion atomica <code>date()</code> de <code>Validations</code>; aqui solo se implementa lo que no puede ser atomico.</p>
 
                 <div class="api-method">
                     <strong>parseDate(str)</strong>
-                    <p>Metodo auxiliar interno. Convierte una cadena <code>dd/mm/aaaa</code> en un objeto <code>Date</code> solo si la fecha existe realmente en el calendario (controla dias por mes y anos bisiestos).</p>
+                    <p>Metodo auxiliar usado internamente por <code>end_date_project_personalized_validation</code>. Convierte una cadena <code>dd/mm/aaaa</code> en un objeto <code>Date</code> si la fecha existe en el calendario, sin restriccion de rango de anos.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -251,21 +251,8 @@
                 </div>
 
                 <div class="api-method">
-                    <strong>start_date_project_personalized_validation(value, allValues)</strong>
-                    <p>Validacion personalizada para <code>start_date_project</code>. Comprueba que la cadena indicada corresponde a una fecha real (por ejemplo <code>31/02/2024</code> no es valida aunque cumpla el formato).</p>
-                    <table class="api-param-table">
-                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
-                        <tbody>
-                            <tr><td>value</td><td>string</td><td>Valor de la fecha de inicio en formato dd/mm/aaaa.</td></tr>
-                            <tr><td>allValues</td><td>object</td><td>Resto de valores del formulario (no se usa en esta validacion).</td></tr>
-                        </tbody>
-                    </table>
-                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si la fecha existe, o <code>start_date_project_personalized_KO</code> en caso contrario.</p>
-                </div>
-
-                <div class="api-method">
                     <strong>end_date_project_personalized_validation(value, allValues)</strong>
-                    <p>Validacion personalizada para <code>end_date_project</code>. Comprueba dos cosas: que la fecha sea real y, si esta presente <code>start_date_project</code>, que la fecha de fin sea posterior a la de inicio.</p>
+                    <p>Validacion personalizada para <code>end_date_project</code>. Comprueba que la fecha de fin sea posterior a la fecha de inicio. La validez de la fecha como tal (dias por mes, bisiestos) la garantiza la validacion atomica <code>date()</code>, que se ejecuta antes en la cadena de validaciones de la estructura.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -273,7 +260,7 @@
                             <tr><td>allValues</td><td>object</td><td>Resto de valores del formulario; se espera <code>start_date_project</code>.</td></tr>
                         </tbody>
                     </table>
-                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si valida, o <code>end_date_project_personalized_KO</code>.</p>
+                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si la fecha de fin es posterior a la de inicio, o <code>end_date_project_personalized_KO</code>.</p>
                 </div>
             </div>
         </div>
@@ -345,6 +332,72 @@
                         </tbody>
                     </table>
                     <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; true si pasa, o codigo de error</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>formatValueForCell(value)</strong>
+                    <p>Convierte un valor a su representacion compacta para mostrarlo en la tabla de detalle. Las cadenas largas con el mismo caracter repetido se muestran como <code>"X".repeat(N)</code> para que la tabla no sea excesivamente ancha.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>value</td><td>*</td><td>Valor a formatear (string, number, boolean, object).</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code> &mdash; representacion compacta para mostrar en celda.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>compactString(str)</strong>
+                    <p>Auxiliar de <code>formatValueForCell</code>. Si la cadena tiene &ge;20 caracteres todos iguales, devuelve la notacion <code>"X".repeat(N)</code>; si no, devuelve la cadena entre comillas.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>str</td><td>string</td><td>Cadena a comprimir.</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>buildStructureSection(info)</strong>
+                    <p>Genera el HTML del bloque de informacion de la estructura de la entidad.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>info</td><td>object</td><td>Resultado de checkStructure().</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code> &mdash; HTML.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>buildDefTestsSection(info)</strong>
+                    <p>Genera el HTML del bloque de informacion de las definiciones de test.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>info</td><td>object</td><td>Resultado de checkDefTests().</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code> &mdash; HTML.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>buildPruebasSection(info)</strong>
+                    <p>Genera el HTML del bloque de resumen de pruebas con los contadores de error/exito por def_test y el boton de detalle.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>info</td><td>object</td><td>Resultado de runPruebas().</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code> &mdash; HTML.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>buildDetailsHTML(pruebasInfo)</strong>
+                    <p>Genera el HTML de la tabla de detalle prueba a prueba con resultado esperado, obtenido e indicador visual EXITO/ERROR. Los valores largos se muestran en formato compacto mediante <code>formatValueForCell</code>.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>pruebasInfo</td><td>object</td><td>Resultado de runPruebas().</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code> &mdash; HTML.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>exportJSON()</strong>
+                    <p>Descarga un fichero <code>tests_atributos_&lt;entidad&gt;.json</code> con el resultado completo de las pruebas de atributos: estructura, definiciones de test y detalle prueba a prueba (campo, accion, valores, resultado esperado, resultado obtenido, si paso o no). Permite al corrector auditar los resultados de forma programatica.</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
                 </div>
             </div>
 
@@ -488,6 +541,42 @@
                     <strong>runAllSubmitTests()</strong>
                     <p>Ejecuta todas las pruebas definidas en <code>nombreentidad_TestSubmit</code>.</p>
                     <p><strong>Retorna:</strong> <code>object</code> &mdash; {byAction, total, totalCorrect, totalIncorrect, allDetails}</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>formatValueForCell(value)</strong>
+                    <p>Igual que el de TestForm: convierte valores a representacion compacta para la tabla de detalle. Las cadenas de caracter repetido se muestran como <code>"X".repeat(N)</code>.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>value</td><td>*</td><td>Valor a formatear.</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>buildSummaryHTML(results)</strong>
+                    <p>Genera el HTML del bloque de resumen por accion con los contadores de correctas/incorrectas y el boton de detalle.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>results</td><td>object</td><td>Resultado de runAllSubmitTests().</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code> &mdash; HTML.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>buildDetailsHTML(results)</strong>
+                    <p>Genera el HTML de la tabla con el detalle de cada prueba de submit: accion, descripcion, atributos/valores, resultado esperado, resultado obtenido e indicador CORRECTO/INCORRECTO.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody><tr><td>results</td><td>object</td><td>Resultado de runAllSubmitTests().</td></tr></tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code> &mdash; HTML.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>exportJSON()</strong>
+                    <p>Descarga un fichero <code>tests_submit_&lt;entidad&gt;.json</code> con el resultado completo de las pruebas de submit: resumen por accion (total, correctas, incorrectas) y detalle prueba a prueba (accion, descripcion, resultado esperado, resultado obtenido, correcta). Si las pruebas fueron auto-generadas se indica el campo <code>autoGeneradas: true</code>.</p>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
                 </div>
             </div>
         </div>
@@ -651,7 +740,7 @@
                             <tr><td>min_size</td><td>readValue.length &gt;= param (false si no existe el elemento)</td><td>boolean</td></tr>
                             <tr><td>max_size</td><td>readValue.length &lt;= param (false si no existe el elemento)</td><td>boolean</td></tr>
                             <tr><td>format</td><td>RegExp(param).test(readValue) &mdash; false si no hay elemento o regex vacia</td><td>boolean</td></tr>
-                            <tr><td>date</td><td>parsea readValue como dd/mm/aaaa y comprueba que sea fecha real</td><td>boolean</td></tr>
+                            <tr><td>date</td><td>parsea readValue como dd/mm/aaaa, comprueba dias por mes y bisiestos, sin restriccion de anos</td><td>boolean</td></tr>
                             <tr><td>no_file</td><td>readFile !== null</td><td>boolean</td></tr>
                             <tr><td>format_name_file</td><td>RegExp(param).test(readFile.name)</td><td>boolean</td></tr>
                             <tr><td>type_file</td><td>param.indexOf(readFile.type) !== -1</td><td>boolean</td></tr>

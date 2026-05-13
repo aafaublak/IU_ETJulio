@@ -58,12 +58,10 @@ var project_estructura = {
             is_unique: false,
             validations: {
                 ADD: {
-                    format: { value: "^\\d{2}/\\d{2}/\\d{4}$", error_msg: "start_date_project_format_KO" },
-                    personalized: { personalize: true, error_msg: "start_date_project_personalized_KO" }
+                    date: { error_msg: "start_date_project_date_KO" }
                 },
                 EDIT: {
-                    format: { value: "^\\d{2}/\\d{2}/\\d{4}$", error_msg: "start_date_project_format_KO" },
-                    personalized: { personalize: true, error_msg: "start_date_project_personalized_KO" }
+                    date: { error_msg: "start_date_project_date_KO" }
                 },
                 SEARCH: {
                     format: { value: "^(\\d{2}/\\d{2}/\\d{4})?$", error_msg: "start_date_project_format_KO" }
@@ -78,11 +76,11 @@ var project_estructura = {
             is_unique: false,
             validations: {
                 ADD: {
-                    format: { value: "^\\d{2}/\\d{2}/\\d{4}$", error_msg: "end_date_project_format_KO" },
+                    date: { error_msg: "end_date_project_date_KO" },
                     personalized: { personalize: true, error_msg: "end_date_project_personalized_KO" }
                 },
                 EDIT: {
-                    format: { value: "^\\d{2}/\\d{2}/\\d{4}$", error_msg: "end_date_project_format_KO" },
+                    date: { error_msg: "end_date_project_date_KO" },
                     personalized: { personalize: true, error_msg: "end_date_project_personalized_KO" }
                 },
                 SEARCH: {
