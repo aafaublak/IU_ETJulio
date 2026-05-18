@@ -117,16 +117,6 @@ button {
     background-color: var(--primary-dark);
 }
 
-.btn-success {
-    background-color: var(--success);
-    border-color: var(--success);
-    color: #fff;
-}
-
-.btn-success:hover {
-    background-color: #0e9572;
-}
-
 .btn-warning {
     background-color: var(--warning);
     border-color: var(--warning);
@@ -136,16 +126,6 @@ button {
 .btn-warning:hover {
     background-color: #d97706;
     color: #fff;
-}
-
-.btn-danger {
-    background-color: var(--error);
-    border-color: var(--error);
-    color: #fff;
-}
-
-.btn-danger:hover {
-    background-color: #c1352f;
 }
 
 /* Header */
@@ -501,11 +481,6 @@ tbody tr:hover {
 
 .detail-back-row {
     margin-bottom: 0.75rem;
-}
-
-.cell-wrap {
-    word-break: break-all;
-    max-width: 280px;
 }
 
 /* La columna de valores de la tabla de detalle puede ser muy grande

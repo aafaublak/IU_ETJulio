@@ -31,9 +31,10 @@ class Gestor {
     }
 
     /**
-     * Lanza la carga de los ficheros asociados a la entidad si no
-     * han sido cargados antes. Acepta que los ficheros opcionales
-     * fallen sin abortar el proceso.
+     * Lanza la carga de los cuatro ficheros asociados a la entidad.
+     * El fichero _Class.js es opcional (solo existe si la entidad
+     * tiene validaciones personalizadas); el resto son obligatorios
+     * y su ausencia se detecta despues en comprobarYMostrar.
      *
      * @param {string} entityName nombre de la entidad.
      * @param {Function} done callback que se invoca al terminar.
@@ -41,17 +42,15 @@ class Gestor {
      */
     loadEntityFiles(entityName, done) {
         var ficheros = [
-            { url: "./js/entities/" + entityName + "_estructura.js", optional: false },
-            { url: "./js/tests/" + entityName + "_tests.js", optional: false },
-            { url: "./js/tests/" + entityName + "_TestSubmit.js", optional: true },
-            { url: "./js/classes/" + entityName + "_Class.js", optional: true }
+            "./js/entities/" + entityName + "_estructura.js",
+            "./js/tests/" + entityName + "_tests.js",
+            "./js/tests/" + entityName + "_TestSubmit.js",
+            "./js/classes/" + entityName + "_Class.js"
         ];
 
         var pendientes = ficheros.length;
-        if (pendientes === 0) { done(); return; }
-
-        ficheros.forEach(function(f) {
-            Gestor.loadScript(f.url, function() {
+        ficheros.forEach(function(url) {
+            Gestor.loadScript(url, function() {
                 pendientes--;
                 if (pendientes === 0) done();
             });
@@ -120,17 +119,11 @@ class Gestor {
             errors.push("No se encontro la variable '" + entityName + "_pruebas' (fichero " + entityName + "_tests.js).");
         }
         if (typeof window[entityName + "_TestSubmit"] === "undefined") {
-            errors.push("No se encontro la variable '" + entityName + "_TestSubmit' (fichero " + entityName + "_TestSubmit.js). Se generara automaticamente a partir de las pruebas de atributo.");
+            errors.push("No se encontro la variable '" + entityName + "_TestSubmit' (fichero " + entityName + "_TestSubmit.js).");
         }
 
-        var bloqueantes = errors.filter(function(e) {
-            return e.indexOf("_estructura") !== -1 ||
-                   e.indexOf("_def_tests") !== -1 ||
-                   e.indexOf("_pruebas") !== -1;
-        });
-
-        if (bloqueantes.length > 0) {
-            this.showErrorModal(bloqueantes);
+        if (errors.length > 0) {
+            this.showErrorModal(errors);
             this.hideTestButtons();
             return false;
         }

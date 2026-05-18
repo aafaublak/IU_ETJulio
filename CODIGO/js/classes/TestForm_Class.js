@@ -75,61 +75,6 @@ class TestForm {
                 self.renderDetails();
             });
         }
-
-        var btnExport = document.getElementById("btn_export_json_atributos");
-        if (btnExport) {
-            var self = this;
-            btnExport.addEventListener("click", function() {
-                self.exportJSON();
-            });
-        }
-    }
-
-    /**
-     * Descarga un fichero JSON con el resultado completo de las pruebas
-     * de atributos: estructura, definiciones de test y detalle prueba
-     * a prueba con resultado esperado, obtenido y si paso o no.
-     *
-     * @returns {void}
-     */
-    exportJSON() {
-        var data = {
-            entidad: this.entityName,
-            fecha: new Date().toISOString(),
-            estructura: this.summaryData.structure,
-            defTests: {
-                total: this.summaryData.defTests.total,
-                bienDefinidas: this.summaryData.defTests.wellDefined,
-                porAtributo: this.summaryData.defTests.byAttribute
-            },
-            pruebas: {
-                total: this.summaryData.pruebas.total,
-                bienDefinidas: this.summaryData.pruebas.wellDefined,
-                exitosas: this.summaryData.pruebas.passed,
-                fallidas: this.summaryData.pruebas.failed,
-                detalle: this.summaryData.pruebas.details.map(function(p) {
-                    return {
-                        numPrueba: p.index + 1,
-                        campo: p.data ? p.data[1] : "",
-                        accion: p.data ? p.data[4] : "",
-                        valores: p.data ? p.data[5] : null,
-                        resultadoEsperado: p.data ? p.data[6] : null,
-                        resultadoObtenido: p.resultObtained,
-                        pasada: p.passed
-                    };
-                })
-            }
-        };
-        var json = JSON.stringify(data, null, 2);
-        var blob = new Blob([json], { type: "application/json" });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = "tests_atributos_" + this.entityName + ".json";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
     }
 
     /**
@@ -621,10 +566,7 @@ class TestForm {
             html += '<p>No hay pruebas de exito esperado.</p>';
         }
 
-        html += '<div class="btn-row">';
         html += '<button class="btn btn-primary" id="btn_ver_detalle_pruebas">Ver detalle de cada prueba</button>';
-        html += '<button class="btn" id="btn_export_json_atributos">Exportar resultados JSON</button>';
-        html += '</div>';
 
         html += '</div>';
         return html;
