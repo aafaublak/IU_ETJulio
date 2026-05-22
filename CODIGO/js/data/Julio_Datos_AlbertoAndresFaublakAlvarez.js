@@ -1,6 +1,4 @@
+//esto quedará vacío hasta laentrega oficial, puesto que son datos sensibles
 var info_entrega = [
-    "Julio",
-    "54921096V",
-    "Alberto Andres Faublak Alvarez",
-    70
+
 ];
