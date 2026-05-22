@@ -50,6 +50,7 @@ Julio_AlbertoAndresFaublakAlvarez/
 4. Pulsar **Test de Atributos** para ejecutar las pruebas de validación campo a campo.
 5. Pulsar **Test de Formulario** para ejecutar las pruebas de submit.
 6. En la ventana de resultados, pulsar **Ver detalle de cada prueba** para ver el resultado prueba a prueba.
+7. Pulsar **Generar JSON TestSubmit** para abrir una ventana con el contenido del fichero `_TestSubmit.js` generado automáticamente desde `nombreentidad_pruebas`, con un botón para copiarlo al portapapeles.
 
 > Los ficheros de cada entidad se cargan dinámicamente al seleccionarla, por lo que no es necesario declararlos en el HTML para añadir una nueva entidad: basta con incluir su nombre en `menu_entidades.js` y colocar los ficheros en los directorios correspondientes.
 
@@ -101,6 +102,8 @@ Ejecuta las pruebas de atributo. Muestra:
 ### TestSubmit (`TestSubmit_Class.js`)
 
 Ejecuta las pruebas de submit definidas en `nombreentidad_TestSubmit`. Muestra el resumen por acción (ADD, EDIT, SEARCH) y el detalle completo prueba a prueba.
+
+Además expone dos métodos estáticos auxiliares — `TestSubmit.generateFromPruebas(entityName, pruebas)` y `TestSubmit.formatAsJsFile(entityName, generated)` — que construyen el contenido del fichero `nombreentidad_TestSubmit.js` automáticamente a partir de las pruebas de campo (`nombreentidad_pruebas`). Estos métodos no sustituyen al fichero (que sigue siendo obligatorio según el enunciado), solo ayudan a producirlo cuando escribir una prueba de submit por cada prueba de campo sería demasiado trabajo.
 
 ### ValidateFieldsForm (`ValidateFieldsForm_Class.js`)
 
@@ -178,8 +181,9 @@ Disponible en `CODIGO/API.html` (enlace en la cabecera de la aplicación). Inclu
 
 - **Carga dinámica de los ficheros de entidad**: el `index.html` solo carga los ficheros del núcleo (5 clases + `menu_entidades.js` + datos de la entrega). Los cuatro ficheros propios de cada entidad (`_estructura.js`, `_tests.js`, `_TestSubmit.js` y, si procede, `_Class.js`) los inserta `Gestor` en el `<head>` cuando el usuario pulsa esa entidad en el menú. Así añadir una entidad nueva no obliga a tocar el HTML, solo a añadir su nombre a `menu_entidades`.
 - **Las cuatro variables son obligatorias**: si falta `nombreentidad_estructura`, `nombreentidad_def_tests`, `nombreentidad_pruebas` o `nombreentidad_TestSubmit`, `Gestor` abre un modal listando los ficheros/variables ausentes. Es la salvaguarda que pide el enunciado para no ejecutar tests sobre datos a medias.
+- **Generador automático de `_TestSubmit.js`**: escribir a mano una prueba de submit por cada prueba de campo es un trabajo enorme; por eso `TestSubmit` ofrece dos métodos estáticos que construyen el array `nombreentidad_TestSubmit` a partir de `nombreentidad_pruebas` y lo devuelven formateado como código JS. El usuario lo copia desde una ventana modal y lo pega en el fichero que pide el enunciado. El generador es accesible de dos formas: como tercer botón en la pantalla de la entidad cuando todos los ficheros están, y como botón dentro del modal de error cuando solo falta `_TestSubmit.js` (así el usuario tiene un camino claro para crearlo). El fichero sigue siendo obligatorio: el generador no lo escribe ni lo sustituye, solo da el contenido listo para copiar.
 - **Validaciones reciben el `id` del elemento HTML**: cada método de `Validations` lee el valor por sí mismo del DOM mediante `readValue` o `readFile`. No se pasa el valor por parámetro porque el enunciado exige que el identificador del elemento sea la entrada.
-- **Validaciones de fichero apoyadas en `readFile`**: las cuatro validaciones de fichero (`no_file`, `format_name_file`, `type_file`, `max_size_file`) usan `readFile` para acceder al objeto `File` real (extensión, MIME, tamaño). Mantener esa helper en paralelo a `readValue` evita tener que parsear el nombre desde una cadena.
+- **Validaciones de fichero y `readValue`**: `no_file` y `format_name_file` usan `readValue` para leer el nombre del fichero como cadena, igual que el resto de validaciones atómicas. `type_file` y `max_size_file` usan `readFile` porque necesitan el objeto `File` completo para consultar el tipo MIME y el tamaño en bytes, que `readValue` no proporciona.
 - **Validez de fechas en `date()` y validación cruzada en `project_Class.js`**: la atómica `date()` comprueba que `dd/mm/aaaa` exista realmente en el calendario (días por mes y bisiestos); la comparación `end_date_project > start_date_project` no puede ser atómica porque depende de otro atributo, así que vive en `project_Class.js` como validación personalizada (`personalize: true` en la estructura). Esto sirve además como ejemplo real de cómo cablear una clase de entidad.
 - **Compactación de valores repetidos en el detalle**: cuando una prueba lleva un valor largo (por ejemplo, una cadena de 200 caracteres iguales para forzar `max_size_KO`), la tabla de detalle lo muestra como `"A".repeat(200)` para que la columna no obligue a desplazarse horizontalmente. Las cadenas heterogéneas se muestran entre comillas tal cual.
 - **`CheckSubmit` acumula todos los errores**: no se aborta al primer fallo. Devuelve `true` si todo es válido o un array con todos los códigos de error encontrados, para que el usuario vea cada problema en una sola pasada. No realiza llamada al backend: el proyecto se queda en la verificación previa.

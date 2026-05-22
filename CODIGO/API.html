@@ -109,7 +109,7 @@
 
                 <div class="api-method">
                     <strong>no_file(elementId)</strong>
-                    <p>Verifica que un input file tenga un archivo seleccionado (usa <code>readFile</code> internamente).</p>
+                    <p>Verifica que un input file tenga un archivo seleccionado. Usa <code>readValue</code> para leer el nombre del fichero: devuelve <code>false</code> si el elemento no existe (<code>null</code>) o si el nombre esta vacio (ningun fichero seleccionado).</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -121,7 +121,7 @@
 
                 <div class="api-method">
                     <strong>format_name_file(elementId, regexpStr)</strong>
-                    <p>Valida el formato del nombre del archivo seleccionado (lee el fichero con <code>readFile</code>). Si no hay fichero o la expresion regular no es valida devuelve <code>false</code>.</p>
+                    <p>Valida el formato del nombre del archivo seleccionado. Usa <code>readValue</code> para leer el nombre como cadena (coherente con el resto de validaciones). Si el elemento no existe, no hay fichero o la expresion regular no es valida devuelve <code>false</code>. <code>readFile</code> solo se usa en las validaciones que necesitan el objeto <code>File</code> completo (<code>type_file</code>, <code>max_size_file</code>).</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -448,25 +448,50 @@
                 </div>
 
                 <div class="api-method">
-                    <strong>showErrorModal(errors)</strong>
-                    <p>Muestra una ventana modal con los errores encontrados.</p>
+                    <strong>showErrorModal(errors, entityToGenerate)</strong>
+                    <p>Muestra una ventana modal con los errores encontrados. Si se pasa <code>entityToGenerate</code>, anade un boton "Generar JSON de TestSubmit" que cierra el modal de error y abre <code>showGeneratorModal</code> para esa entidad.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
-                            <tr><td>errors</td><td>Array&lt;string&gt;</td><td>Lista de mensajes de error</td></tr>
+                            <tr><td>errors</td><td>Array&lt;string&gt;</td><td>Lista de mensajes de error.</td></tr>
+                            <tr><td>entityToGenerate</td><td>string|null</td><td>Opcional. Nombre de la entidad para la que se puede generar el TestSubmit (solo se pasa cuando lo unico que falta es <code>_TestSubmit</code>).</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="api-method">
                     <strong>showTestButtons(entityName)</strong>
-                    <p>Muestra los botones "Test de Atributos" y "Test de Formulario", junto al boton "Volver al Inicio".</p>
+                    <p>Muestra los botones "Test de Atributos", "Test de Formulario" y "Generar JSON TestSubmit", junto al boton "Volver al Inicio".</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
                             <tr><td>entityName</td><td>string</td><td>Nombre de la entidad</td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <div class="api-method">
+                    <strong>showGeneratorModal(entityName)</strong>
+                    <p>Abre la ventana del generador automatico de <code>nombreentidad_TestSubmit.js</code>. Llama a los metodos estaticos <code>TestSubmit.generateFromPruebas</code> y <code>TestSubmit.formatAsJsFile</code> y muestra el codigo JS resultante en un bloque <code>&lt;pre&gt;</code> con un boton "Copiar al portapapeles" para que el usuario lo pegue en el fichero que el enunciado pide.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
+                </div>
+
+                <div class="api-method">
+                    <strong>static _copyToClipboard(text)</strong>
+                    <p>Copia una cadena al portapapeles. Intenta primero <code>navigator.clipboard.writeText</code> y, si no esta disponible o es rechazada (caso tipico al abrir el proyecto con <code>file://</code>), recurre a un fallback con un <code>&lt;textarea&gt;</code> temporal + <code>document.execCommand("copy")</code>. Muestra el indicador "Copiado al portapapeles" durante 2 segundos cuando la copia tiene exito.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>text</td><td>string</td><td>Cadena a copiar.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>void</code></p>
                 </div>
 
                 <div class="api-method">
@@ -481,7 +506,33 @@
 
             <div class="api-class" id="class-TestSubmit">
                 <h3>TestSubmit <code>TestSubmit_Class.js</code></h3>
-                <p>Clase que ejecuta las pruebas de submit del formulario. Verifica todos los atributos para cada accion (ADD, EDIT, SEARCH) sin realizar peticiones al backend.</p>
+                <p>Clase que ejecuta las pruebas de submit del formulario. Verifica todos los atributos para cada accion (ADD, EDIT, SEARCH) sin realizar peticiones al backend. Expone ademas dos metodos estaticos auxiliares para construir el contenido del fichero <code>nombreentidad_TestSubmit.js</code> automaticamente a partir de las pruebas de campo individuales, ya que escribirlas todas a mano para una entidad nueva es muy costoso. El fichero sigue siendo obligatorio segun el enunciado: estos metodos solo ayudan a producir su contenido.</p>
+
+                <div class="api-method">
+                    <strong>static generateFromPruebas(entityName, pruebas)</strong>
+                    <p>Construye un array con el mismo formato que <code>nombreentidad_TestSubmit</code> a partir del array <code>nombreentidad_pruebas</code>. Por cada accion (ADD, EDIT, SEARCH) acumula un baseline con los valores validos disponibles en las pruebas de exito y, por cada prueba, genera una entrada que aplica los valores de la prueba sobre ese baseline (preservando el resultado esperado).</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad.</td></tr>
+                            <tr><td>pruebas</td><td>Array</td><td>Array <code>nombreentidad_pruebas</code>.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>Array</code> &mdash; mismo formato que <code>nombreentidad_TestSubmit</code>.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>static formatAsJsFile(entityName, generated)</strong>
+                    <p>Formatea el array generado como una cadena JS lista para pegar en el fichero <code>nombreentidad_TestSubmit.js</code>, con la declaracion <code>var nombreentidad_TestSubmit = [...]</code> y una prueba por linea.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad.</td></tr>
+                            <tr><td>generated</td><td>Array</td><td>Array devuelto por <code>generateFromPruebas</code>.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>string</code> &mdash; codigo JS con la declaracion completa.</p>
+                </div>
 
                 <div class="api-method">
                     <strong>constructor(entityName)</strong>
@@ -585,7 +636,7 @@
                     <div class="flow-branches">
                         <div class="flow-branch">
                             <div class="flow-arrow">No &darr;</div>
-                            <div class="flow-box flow-error">Modal de error</div>
+                            <div class="flow-box flow-error">Modal de error<br>(+ boton "Generar JSON TestSubmit"<br>si solo falta _TestSubmit)</div>
                         </div>
                         <div class="flow-branch">
                             <div class="flow-arrow">Si &darr;</div>
@@ -604,6 +655,12 @@
                                     <div class="flow-box"><a href="#class-TestSubmit">TestSubmit.run()</a></div>
                                     <div class="flow-arrow">&darr;</div>
                                     <div class="flow-box flow-end">Modal con resultados de submit</div>
+                                </div>
+                                <div class="flow-branch">
+                                    <div class="flow-arrow">Generar JSON &darr;</div>
+                                    <div class="flow-box">Gestor.showGeneratorModal<br>&rarr; TestSubmit.generateFromPruebas<br>&rarr; TestSubmit.formatAsJsFile</div>
+                                    <div class="flow-arrow">&darr;</div>
+                                    <div class="flow-box flow-end">Modal con codigo JS<br>+ boton Copiar</div>
                                 </div>
                             </div>
                         </div>

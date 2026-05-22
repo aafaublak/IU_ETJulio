@@ -124,17 +124,24 @@ class Validations {
 
     /**
      * Comprueba que un input file tenga un fichero seleccionado.
+     * Usa readValue: para inputs file devuelve el nombre del fichero
+     * o cadena vacia si no hay ninguno seleccionado.
      *
      * @param {string} elementId id del input file.
-     * @returns {boolean} true si hay fichero.
+     * @returns {boolean} true si hay fichero seleccionado.
      */
     no_file(elementId) {
-        return this.readFile(elementId) !== null;
+        var value = this.readValue(elementId);
+        if (value === null) return false;
+        return value !== "";
     }
 
     /**
      * Comprueba que el nombre del fichero seleccionado case con la
-     * expresion regular indicada.
+     * expresion regular indicada. Usa readValue para leer el nombre
+     * del fichero como cadena (igual que el resto de validaciones).
+     * readFile solo se usa cuando se necesita el objeto File completo
+     * (tipo MIME o tamano), que readValue no proporciona.
      *
      * @param {string} elementId id del input file.
      * @param {string} regexpStr expresion regular en formato cadena.
@@ -142,10 +149,10 @@ class Validations {
      */
     format_name_file(elementId, regexpStr) {
         if (typeof regexpStr !== "string" || regexpStr === "") return false;
-        var file = this.readFile(elementId);
-        if (file === null) return false;
+        var value = this.readValue(elementId);
+        if (value === null || value === "") return false;
         var regex = new RegExp(regexpStr);
-        return regex.test(file.name);
+        return regex.test(value);
     }
 
     /**

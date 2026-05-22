@@ -5,8 +5,93 @@
  * entidad para cada accion (ADD, EDIT, SEARCH), aplica todas las
  * validaciones y acumula los errores. No llama al backend, solo
  * comprueba que los datos estarian listos para enviarse.
+ *
+ * Ademas expone dos metodos estaticos auxiliares que permiten
+ * construir el contenido del fichero nombreentidad_TestSubmit.js
+ * automaticamente a partir de las pruebas de campo individuales
+ * (nombreentidad_pruebas), para que el usuario pueda copiarlo y
+ * pegarlo en lugar de escribir manualmente cada prueba de submit.
+ * El fichero sigue siendo obligatorio segun el enunciado: estos
+ * metodos solo ayudan a producir su contenido.
  */
 class TestSubmit {
+
+    /**
+     * Construye un array con el mismo formato que
+     * nombreentidad_TestSubmit a partir del array
+     * nombreentidad_pruebas. Por cada accion (ADD, EDIT, SEARCH)
+     * agrupa los valores validos disponibles en un "baseline"
+     * y, por cada prueba (sea de exito o de error), genera una
+     * entrada que aplica los valores de la prueba sobre ese
+     * baseline. Asi se cubren todos los casos de prueba de campo
+     * a nivel de submit sin tener que escribirlos a mano.
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @param {Array} pruebas array nombreentidad_pruebas.
+     * @returns {Array} array con el mismo formato que
+     *                  nombreentidad_TestSubmit.
+     */
+    static generateFromPruebas(entityName, pruebas) {
+        if (!Array.isArray(pruebas)) return [];
+
+        var baselines = {};
+
+        pruebas.forEach(function(p) {
+            if (!Array.isArray(p) || p.length < 7) return;
+            var accion = p[4];
+            var resultado = p[6];
+            var valores = p[5];
+            if (resultado !== true) return;
+            if (typeof valores !== "object" || valores === null) return;
+            if (!baselines[accion]) baselines[accion] = {};
+            Object.keys(valores).forEach(function(k) {
+                baselines[accion][k] = valores[k];
+            });
+        });
+
+        var generated = [];
+        var counter = 1;
+
+        pruebas.forEach(function(p) {
+            if (!Array.isArray(p) || p.length < 7) return;
+            var accion = p[4];
+            var valores = p[5];
+            var resultado = p[6];
+            var descripcion = "Auto-gen prueba " + p[3] + " sobre " + p[1];
+
+            var base = baselines[accion] ? Object.assign({}, baselines[accion]) : {};
+            if (typeof valores === "object" && valores !== null) {
+                Object.keys(valores).forEach(function(k) {
+                    base[k] = valores[k];
+                });
+            }
+
+            generated.push([entityName, accion, counter, descripcion, base, resultado]);
+            counter++;
+        });
+
+        return generated;
+    }
+
+    /**
+     * Formatea el array generado por generateFromPruebas como una
+     * cadena JS lista para pegar en el fichero
+     * nombreentidad_TestSubmit.js. Cada prueba ocupa una linea para
+     * facilitar la lectura.
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @param {Array} generated array generado por generateFromPruebas.
+     * @returns {string} codigo JS con la declaracion completa.
+     */
+    static formatAsJsFile(entityName, generated) {
+        var lines = ["var " + entityName + "_TestSubmit = ["];
+        generated.forEach(function(test, i) {
+            var comma = (i < generated.length - 1) ? "," : "";
+            lines.push("    " + JSON.stringify(test) + comma);
+        });
+        lines.push("];");
+        return lines.join("\n");
+    }
 
     /**
      * @param {string} entityName nombre de la entidad.

@@ -4,8 +4,15 @@
  * Se encarga de cargar los ficheros de una entidad al seleccionarla
  * en el menu (carga dinamica mediante script tags) y de comprobar que
  * existen las variables necesarias antes de mostrar los botones de
- * test. Si falta alguna variable bloqueante muestra un modal de error.
- * Los ficheros _Class.js y _TestSubmit.js son opcionales.
+ * test. Si falta alguna de las cuatro variables obligatorias
+ * (_estructura, _def_tests, _pruebas y _TestSubmit) muestra un modal
+ * de error. El fichero _Class.js solo se requiere si la entidad
+ * declara validaciones con personalize: true.
+ *
+ * Tambien expone el generador automatico de nombreentidad_TestSubmit
+ * (showGeneratorModal), que se ofrece como tercer boton en la
+ * pantalla de la entidad y como boton dentro del modal de error
+ * cuando solo falta el fichero _TestSubmit.js.
  */
 class Gestor {
 
@@ -108,22 +115,22 @@ class Gestor {
      */
     comprobarYMostrar(entityName) {
         var errors = [];
+        var faltaEstructura = typeof window[entityName + "_estructura"] === "undefined";
+        var faltaDefTests   = typeof window[entityName + "_def_tests"] === "undefined";
+        var faltaPruebas    = typeof window[entityName + "_pruebas"] === "undefined";
+        var faltaTestSubmit = typeof window[entityName + "_TestSubmit"] === "undefined";
 
-        if (typeof window[entityName + "_estructura"] === "undefined") {
-            errors.push("No se encontro la variable '" + entityName + "_estructura' (fichero " + entityName + "_estructura.js).");
-        }
-        if (typeof window[entityName + "_def_tests"] === "undefined") {
-            errors.push("No se encontro la variable '" + entityName + "_def_tests' (fichero " + entityName + "_tests.js).");
-        }
-        if (typeof window[entityName + "_pruebas"] === "undefined") {
-            errors.push("No se encontro la variable '" + entityName + "_pruebas' (fichero " + entityName + "_tests.js).");
-        }
-        if (typeof window[entityName + "_TestSubmit"] === "undefined") {
-            errors.push("No se encontro la variable '" + entityName + "_TestSubmit' (fichero " + entityName + "_TestSubmit.js).");
-        }
+        if (faltaEstructura) errors.push("No se encontro la variable '" + entityName + "_estructura' (fichero " + entityName + "_estructura.js).");
+        if (faltaDefTests)   errors.push("No se encontro la variable '" + entityName + "_def_tests' (fichero " + entityName + "_tests.js).");
+        if (faltaPruebas)    errors.push("No se encontro la variable '" + entityName + "_pruebas' (fichero " + entityName + "_tests.js).");
+        if (faltaTestSubmit) errors.push("No se encontro la variable '" + entityName + "_TestSubmit' (fichero " + entityName + "_TestSubmit.js).");
 
         if (errors.length > 0) {
-            this.showErrorModal(errors);
+            // Si solo falta _TestSubmit y tenemos _pruebas + _estructura,
+            // ofrecemos al usuario la herramienta para auto-generar el
+            // contenido del fichero a partir de las pruebas de campo.
+            var puedeGenerar = faltaTestSubmit && !faltaEstructura && !faltaPruebas;
+            this.showErrorModal(errors, puedeGenerar ? entityName : null);
             this.hideTestButtons();
             return false;
         }
@@ -133,12 +140,17 @@ class Gestor {
     }
 
     /**
-     * Muestra una ventana modal con los errores indicados.
+     * Muestra una ventana modal con los errores indicados. Si se
+     * pasa <code>entityToGenerate</code>, anade un boton para abrir
+     * el generador automatico del fichero TestSubmit a partir de
+     * las pruebas de campo de esa entidad.
      *
      * @param {string[]} errors lista de mensajes de error.
+     * @param {string} [entityToGenerate] nombre de la entidad para
+     *        la que se puede generar nombreentidad_TestSubmit.
      * @returns {void}
      */
-    showErrorModal(errors) {
+    showErrorModal(errors, entityToGenerate) {
         var overlay = document.getElementById("modal_overlay");
         var modal = document.getElementById("error_modal");
         var errorBody = document.getElementById("error_modal_body");
@@ -154,14 +166,120 @@ class Gestor {
         }
         html += '</ul>';
 
+        if (entityToGenerate) {
+            html += '<p>Como solo falta el fichero <code>' + entityToGenerate + '_TestSubmit.js</code>, ';
+            html += 'puedes generar su contenido automaticamente a partir de las pruebas de campo y copiarlo al fichero:</p>';
+            html += '<button class="btn btn-primary" id="btn_generar_testsubmit_modal">Generar JSON de TestSubmit</button>';
+        }
+
         errorBody.innerHTML = html;
         overlay.hidden = false;
         modal.hidden = false;
+
+        if (entityToGenerate) {
+            var self = this;
+            var btn = document.getElementById("btn_generar_testsubmit_modal");
+            if (btn) {
+                btn.addEventListener("click", function() {
+                    overlay.hidden = true;
+                    modal.hidden = true;
+                    self.showGeneratorModal(entityToGenerate);
+                });
+            }
+        }
     }
 
     /**
-     * Pinta los botones "Test de Atributos", "Test de Formulario" y
-     * "Volver al Inicio" en la zona de trabajo.
+     * Abre el modal grande de resultados con el codigo JS generado
+     * automaticamente para nombreentidad_TestSubmit. Incluye un
+     * boton para copiarlo al portapapeles. El usuario pega ese
+     * contenido en el fichero que pide el enunciado.
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @returns {void}
+     */
+    showGeneratorModal(entityName) {
+        var pruebas = window[entityName + "_pruebas"];
+        if (!Array.isArray(pruebas)) {
+            this.showErrorModal(["No se puede generar: falta la variable '" + entityName + "_pruebas'."]);
+            return;
+        }
+
+        var generated = TestSubmit.generateFromPruebas(entityName, pruebas);
+        var jsCode = TestSubmit.formatAsJsFile(entityName, generated);
+
+        var overlay = document.getElementById("result_overlay");
+        var title = document.getElementById("result_modal_title");
+        var body = document.getElementById("result_modal_body");
+
+        if (!overlay || !title || !body) return;
+
+        title.textContent = "Generador " + entityName + "_TestSubmit.js";
+
+        body.innerHTML =
+            '<div class="section">' +
+            '<p>Pruebas de submit generadas automaticamente a partir de <code>' + entityName + '_pruebas</code> (' +
+            generated.length + ' pruebas). Copialas y pegalas en el fichero ' +
+            '<code>js/tests/' + entityName + '_TestSubmit.js</code> para cumplir el enunciado.</p>' +
+            '<p><button class="btn btn-primary" id="btn_copiar_codigo">Copiar al portapapeles</button> ' +
+            '<span id="copy_feedback" class="ok" hidden> Copiado al portapapeles</span></p>' +
+            '<pre class="code-output" id="code_output_block"></pre>' +
+            '</div>';
+
+        var preEl = document.getElementById("code_output_block");
+        if (preEl) preEl.textContent = jsCode;
+
+        var btnCopy = document.getElementById("btn_copiar_codigo");
+        if (btnCopy) {
+            btnCopy.addEventListener("click", function() {
+                Gestor._copyToClipboard(jsCode);
+            });
+        }
+
+        overlay.hidden = false;
+    }
+
+    /**
+     * Copia una cadena al portapapeles intentando primero la API
+     * moderna (navigator.clipboard) y, si no esta disponible o es
+     * rechazada (caso tipico al abrir el proyecto con file:// en el
+     * navegador del corrector), recurre al fallback con un textarea
+     * temporal + document.execCommand("copy").
+     *
+     * @param {string} text cadena a copiar.
+     * @returns {void}
+     */
+    static _copyToClipboard(text) {
+        var showFeedback = function() {
+            var fb = document.getElementById("copy_feedback");
+            if (fb) {
+                fb.hidden = false;
+                setTimeout(function() { fb.hidden = true; }, 2000);
+            }
+        };
+        var fallback = function() {
+            var ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); showFeedback(); } catch (e) {}
+            document.body.removeChild(ta);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(showFeedback).catch(fallback);
+        } else {
+            fallback();
+        }
+    }
+
+    /**
+     * Pinta los botones "Test de Atributos", "Test de Formulario",
+     * "Generar JSON TestSubmit" y "Volver al Inicio" en la zona de
+     * trabajo. El boton de generar permite regenerar el contenido
+     * de nombreentidad_TestSubmit.js en cualquier momento (por
+     * ejemplo despues de anadir nuevas pruebas de campo).
      *
      * @param {string} entityName nombre de la entidad.
      * @returns {void}
@@ -204,9 +322,20 @@ class Gestor {
         });
         btnContainer.appendChild(btnTestSubmit);
 
+        var self = this;
+
+        var btnGenerar = document.createElement("button");
+        btnGenerar.className = "btn";
+        btnGenerar.innerHTML = '<img src="./iconos/TEST.png" alt="" class="btn-icon-img"> Generar JSON TestSubmit';
+        btnGenerar.id = "btn_generar_testsubmit";
+        btnGenerar.title = "Regenera el contenido de " + entityName + "_TestSubmit.js a partir de las pruebas de campo";
+        btnGenerar.addEventListener("click", function() {
+            self.showGeneratorModal(entityName);
+        });
+        btnContainer.appendChild(btnGenerar);
+
         workArea.appendChild(btnContainer);
 
-        var self = this;
         var btnBack = document.createElement("button");
         btnBack.className = "btn";
         btnBack.innerHTML = '<img src="./iconos/BACK.png" alt="" class="btn-icon-img"> Volver al Inicio';

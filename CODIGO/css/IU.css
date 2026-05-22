@@ -515,6 +515,23 @@ table.table-details td {
     margin-bottom: 0.35rem;
 }
 
+/* Bloque para mostrar el codigo JS generado por el "Generador de
+   TestSubmit". Mantiene los saltos de linea originales y permite
+   desplazarse si el contenido es muy largo. */
+.code-output {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre;
+    overflow: auto;
+    max-height: 55vh;
+}
+
 /* API.html */
 .api-container {
     width: 100%;
