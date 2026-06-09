@@ -127,10 +127,10 @@ La validación atómica `date()` no impone ningún rango de años: acepta cualqu
 
 ### `nombreentidad_estructura.js`
 
-Se sigue el formato de la estructura de datos de la entrega: la variable principal se declara como `estructura_nombreentidad` (con un alias `nombreentidad_estructura` para el nombre que cita el enunciado de julio). Cada regla de validación con parámetro es una **tupla** `[valor, "codigo_mensaje"]`; las reglas sin parámetro (`no_file`, `date`) se indican solo con su `"codigo_mensaje"`, y las personalizadas con `personalize: true`.
+Se usa el nombre de variable `nombreentidad_estructura` exigido por el enunciado. Cada regla de validación con parámetro es una **tupla** `[valor, "codigo_mensaje"]`; las reglas sin parámetro (`no_file`, `date`) se indican solo con su `"codigo_mensaje"`, y las personalizadas con `personalize: true`.
 
 ```js
-var estructura_nombreentidad = {
+var nombreentidad_estructura = {
     attributes_list: ["attr1", "attr2", ...],
     attributes: {
         attr1: {
@@ -151,9 +151,6 @@ var estructura_nombreentidad = {
         }
     }
 };
-
-// Alias con el nombre citado en el enunciado de julio.
-var nombreentidad_estructura = estructura_nombreentidad;
 ```
 
 ### `nombreentidad_tests.js`

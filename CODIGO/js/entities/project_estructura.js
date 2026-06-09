@@ -1,19 +1,18 @@
 /**
  * Estructura de la entidad project.
  *
- * Sigue el formato de estructura de datos de la entrega: variable
- * estructura_<entidad>, attributes_list y attributes con validation_rules
+ * Variable nombreentidad_estructura exigida por el enunciado. Sigue el
+ * formato de la entrega: attributes_list y attributes con validation_rules
  * cuyas reglas con parametro son TUPLAS [valor, "codigo_mensaje"]. Las
  * reglas sin parametro se indican solo con su "codigo_mensaje" (no_file,
  * date). Las validaciones personalizadas de atributo se marcan con
  * personalize: true; el sistema invoca entonces el metodo
  * <atributo>_personalized_validation() de la clase de la entidad.
  *
- * Se declara con var (cuelga de window) y se expone el alias
- * project_estructura (nombre nombreentidad_estructura del enunciado de
- * julio).
+ * Declarada con var para que cuelgue de window y el Gestor la encuentre
+ * por nombre.
  */
-var estructura_project = {
+var project_estructura = {
 	attributes_list: [
 		"id_project",
 		"name_project",
@@ -239,6 +238,3 @@ var estructura_project = {
 		}
 	}
 };
-
-// Alias con el nombre nombreentidad_estructura citado en el enunciado de julio.
-var project_estructura = estructura_project;

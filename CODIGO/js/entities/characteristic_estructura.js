@@ -1,19 +1,16 @@
 /**
  * Estructura de la entidad characteristic.
  *
- * Sigue el formato de estructura de datos de la entrega: la variable
- * principal se llama estructura_<entidad>, lleva attributes_list y
- * attributes, y cada regla de validacion se define dentro de
- * validation_rules como una TUPLA [valor, "codigo_mensaje"] (las que no
- * llevan parametro, como no_file, se indican solo con el "codigo_mensaje").
+ * Variable nombreentidad_estructura exigida por el enunciado. Sigue el
+ * formato de la entrega: attributes_list y attributes con validation_rules
+ * cuyas reglas con parametro son TUPLAS [valor, "codigo_mensaje"] (las que
+ * no llevan parametro, como no_file, se indican solo con el
+ * "codigo_mensaje").
  *
- * Se declara con var (no const) para que la variable quede colgada de
- * window y las clases puedan localizarla por nombre. Ademas se expone
- * el alias characteristic_estructura, que es el nombre que cita el
- * enunciado de julio (nombreentidad_estructura), de modo que la
- * estructura es accesible con cualquiera de los dos nombres.
+ * Declarada con var para que cuelgue de window y el Gestor la encuentre
+ * por nombre.
  */
-var estructura_characteristic = {
+var characteristic_estructura = {
 	attributes_list: [
 		"id_characteristic",
 		"name_characteristic",
@@ -153,6 +150,3 @@ var estructura_characteristic = {
 		}
 	}
 };
-
-// Alias con el nombre nombreentidad_estructura citado en el enunciado de julio.
-var characteristic_estructura = estructura_characteristic;

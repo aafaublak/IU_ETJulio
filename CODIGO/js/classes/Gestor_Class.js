@@ -7,7 +7,8 @@
  * test. Si falta alguna de las cuatro variables obligatorias
  * (_estructura, _def_tests, _pruebas y _TestSubmit) muestra un modal
  * de error. El fichero _Class.js solo se requiere si la entidad
- * declara validaciones con personalize: true.
+ * declara validaciones personalizadas (personalize: true en su
+ * estructura).
  *
  * Tambien expone el generador automatico de nombreentidad_TestSubmit
  * (showGeneratorModal), que se ofrece como tercer boton en la
@@ -381,10 +382,11 @@ class Gestor {
     }
 
     /**
-     * Localiza la estructura de una entidad admitiendo los dos nombres
-     * de variable usados en la asignatura: el del enunciado de julio
-     * (nombreentidad_estructura) y el del ejemplo de la entrega
-     * (estructura_nombreentidad).
+     * Localiza la estructura de una entidad. El nombre canonico es
+     * nombreentidad_estructura (exigido por el enunciado). Se admite
+     * tambien el orden inverso (estructura_nombreentidad) para que el
+     * sistema funcione con entidades propias del corrector que usen
+     * cualquiera de las dos convenciones.
      *
      * @param {string} entityName nombre de la entidad.
      * @returns {object|undefined} estructura encontrada o undefined.

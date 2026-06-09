@@ -1,16 +1,15 @@
 /**
  * Estructura de la entidad analysis_preparation.
  *
- * Sigue el formato de estructura de datos de la entrega: variable
- * estructura_<entidad>, attributes_list y attributes con validation_rules
+ * Variable nombreentidad_estructura exigida por el enunciado. Sigue el
+ * formato de la entrega: attributes_list y attributes con validation_rules
  * cuyas reglas son TUPLAS [valor, "codigo_mensaje"] (no_file solo lleva
  * el "codigo_mensaje").
  *
- * Se declara con var para que cuelgue de window y se expone tambien el
- * alias analysis_preparation_estructura (nombre nombreentidad_estructura
- * del enunciado de julio).
+ * Declarada con var para que cuelgue de window y el Gestor la encuentre
+ * por nombre.
  */
-var estructura_analysis_preparation = {
+var analysis_preparation_estructura = {
 	attributes_list: [
 		"id_analysis_preparation",
 		"name_analysis_preparation",
@@ -118,6 +117,3 @@ var estructura_analysis_preparation = {
 		}
 	}
 };
-
-// Alias con el nombre nombreentidad_estructura citado en el enunciado de julio.
-var analysis_preparation_estructura = estructura_analysis_preparation;
