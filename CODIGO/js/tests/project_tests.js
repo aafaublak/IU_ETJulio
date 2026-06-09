@@ -171,9 +171,9 @@ var project_def_tests = [
     ["project", "id_sampling_methodology", "input", 109, "Validar format id_sampling en SEARCH", "SEARCH", "id_sampling_methodology_format_KO", "ID metodologia con formato incorrecto en SEARCH"],
     ["project", "id_sampling_methodology", "input", 110, "Validar id_sampling correcto en SEARCH", "SEARCH", true, "ID metodologia correcto en SEARCH"],
 
-    // === fechas - validacion personalizada de fecha real ===
-    // (se aprovecha que start_date y end_date tienen personalize: true para
-    //  comprobar que la fecha existe en el calendario, no solo que cumple el regex)
+    // === fechas - validacion de fecha real (atomica date) ===
+    // (la validacion atomica date comprueba que la fecha exista en el
+    //  calendario, no solo que cumpla el patron dd/mm/aaaa)
     ["project", "start_date_project", "input", 111, "Validar date fecha real start_date en ADD (ej. 31/02/2024)", "ADD", "start_date_project_date_KO", "Fecha de inicio inexistente en el calendario"],
     ["project", "start_date_project", "input", 112, "Validar date fecha real start_date en EDIT", "EDIT", "start_date_project_date_KO", "Fecha de inicio inexistente en el calendario EDIT"],
     ["project", "end_date_project", "input", 113, "Validar date fecha real end_date en ADD (ej. 30/02/2024)", "ADD", "end_date_project_date_KO", "Fecha de fin inexistente en el calendario"],

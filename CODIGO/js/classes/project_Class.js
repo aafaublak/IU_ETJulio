@@ -8,7 +8,8 @@
  *
  * Los metodos *_personalized_validation se invocan automaticamente
  * desde Validations.personalized cuando en la estructura el atributo
- * lleva la clave "personalized" con personalize: true.
+ * lleva personalize: true en su validation_rules. El nombre del metodo
+ * se deriva del nombre del atributo: <atributo>_personalized_validation.
  */
 class project {
 
@@ -46,21 +47,26 @@ class project {
      * existe start_date_project, que la fecha de fin sea posterior
      * a la de inicio.
      *
-     * @param {string} value valor del atributo end_date_project.
-     * @param {object} allValues objeto con todos los valores del
-     *                           formulario; se espera start_date_project.
+     * Recibe el objeto con todos los valores del formulario (lo pasa
+     * Validations.personalized) y de el lee end_date_project y
+     * start_date_project.
+     *
+     * @param {object} allValues valores del formulario {atributo: valor}.
      * @returns {boolean|string} true si valida, o codigo de error.
      */
-    end_date_project_personalized_validation(value, allValues) {
-        if (!value) return true;
+    end_date_project_personalized_validation(allValues) {
+        var endValue = allValues ? allValues.end_date_project : undefined;
+        var startValue = allValues ? allValues.start_date_project : undefined;
 
-        var endDate = this.parseDate(value);
+        if (!endValue) return true;
+
+        var endDate = this.parseDate(endValue);
         if (endDate === null) {
             return "end_date_project_personalized_KO";
         }
 
-        if (!allValues || !allValues.start_date_project) return true;
-        var startDate = this.parseDate(allValues.start_date_project);
+        if (!startValue) return true;
+        var startDate = this.parseDate(startValue);
         if (startDate === null) return true;
 
         if (endDate <= startDate) {

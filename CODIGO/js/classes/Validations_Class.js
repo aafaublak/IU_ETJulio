@@ -185,21 +185,29 @@ class Validations {
     }
 
     /**
-     * Lanza la validacion personalizada definida en la clase de la
-     * entidad. El nombre del metodo a invocar se obtiene a partir del
-     * nombre del atributo: <attrName>_personalized_validation.
+     * Lanza la validacion personalizada de un atributo (personalize: true
+     * en su definicion de la estructura) sobre la clase de la entidad.
      *
-     * @param {string} elementId id del elemento HTML.
+     * Tal como indica el enunciado, el metodo a invocar se deriva del
+     * nombre del atributo: <atributo>_personalized_validation(). Se le
+     * pasa el objeto con todos los valores del formulario para que pueda
+     * hacer validaciones cruzadas (por ejemplo, comparar end_date con
+     * start_date).
+     *
+     * Si la clase de la entidad o el metodo no existen se devuelve true,
+     * porque el enunciado permite que no exista clase de entidad cuando
+     * no hay validaciones personalizadas.
+     *
+     * @param {string} elementId id/nombre del atributo a validar; de el se
+     *                           deriva el metodo <atributo>_personalized_validation.
      * @param {object} entityInstance instancia de la clase de la entidad.
-     * @param {string} attrName nombre del atributo.
      * @param {object} allValues objeto con todos los valores del formulario.
      * @returns {boolean|string} true si valido, o el codigo de error.
      */
-    personalized(elementId, entityInstance, attrName, allValues) {
-        var methodName = attrName + "_personalized_validation";
+    personalized(elementId, entityInstance, allValues) {
+        var methodName = elementId + "_personalized_validation";
         if (entityInstance && typeof entityInstance[methodName] === "function") {
-            var value = this.readValue(elementId);
-            return entityInstance[methodName](value, allValues);
+            return entityInstance[methodName](allValues);
         }
         return true;
     }

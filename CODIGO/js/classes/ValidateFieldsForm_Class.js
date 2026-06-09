@@ -32,8 +32,9 @@ class ValidateFieldsForm {
         var element;
 
         var fileMode = (htmlDef.tag === "input" && htmlDef.type === "file") || htmlDef.tag === "file";
-        if (fileMode && action && attrDef.validations && attrDef.validations[action]) {
-            var v = attrDef.validations[action];
+        var reglas = attrDef.validation_rules || attrDef.validations;
+        if (fileMode && action && reglas && reglas[action]) {
+            var v = reglas[action];
             var hasFileSpecific = v.no_file || v.type_file || v.format_name_file || v.max_size_file;
             if (!hasFileSpecific) fileMode = false;
         }
@@ -174,8 +175,10 @@ class ValidateFieldsForm {
      * @returns {boolean|string} true si pasa la validacion, false o string si falla.
      */
     executeValidation(validationType, elementId, param, entityInstance, attrName, allValues) {
-        if (validationType === "personalized") {
-            return this.validations.personalized(elementId, entityInstance, attrName, allValues);
+        if (validationType === "personalize") {
+            // personalize: true en la estructura -> se invoca el metodo
+            // <atributo>_personalized_validation() de la clase de la entidad.
+            return this.validations.personalized(elementId, entityInstance, allValues);
         }
 
         if (typeof this.validations[validationType] === "function") {

@@ -13,14 +13,14 @@ class TestForm {
      */
     constructor(entityName) {
         this.entityName = entityName;
-        this.estructura = window[entityName + "_estructura"];
-        this.defTests = window[entityName + "_def_tests"];
-        this.pruebas = window[entityName + "_pruebas"];
+        this.estructura = Gestor.resolveEstructura(entityName);
+        this.defTests = Gestor.resolveGlobal(entityName + "_def_tests");
+        this.pruebas = Gestor.resolveGlobal(entityName + "_pruebas");
         this.entityInstance = null;
         this.validateFields = new ValidateFieldsForm();
 
         try {
-            var EntityClass = window[entityName];
+            var EntityClass = Gestor.resolveEntityClass(entityName);
             if (typeof EntityClass === "function") {
                 this.entityInstance = new EntityClass();
             }
@@ -112,11 +112,6 @@ class TestForm {
             return result;
         }
 
-        if (!this.estructura.entity || this.estructura.entity !== this.entityName) {
-            result.errors.push("El campo 'entity' no coincide con el nombre de la entidad.");
-            result.isCorrect = false;
-        }
-
         if (!this.estructura.attributes_list || !Array.isArray(this.estructura.attributes_list)) {
             result.errors.push("No existe o no es un array el campo 'attributes_list'.");
             result.isCorrect = false;
@@ -142,14 +137,18 @@ class TestForm {
                     attrInfo.valid = false;
                     attrInfo.errors.push("Falta la definicion HTML (tag).");
                 }
-                if (typeof attrDef.is_pk !== "boolean") {
+                // is_pk e is_null son opcionales en la estructura (el ejemplo
+                // de la entrega solo declara is_pk/is_autoincrement en la
+                // clave primaria); solo se marca error si vienen con un tipo
+                // que no es boolean.
+                if (attrDef.is_pk !== undefined && typeof attrDef.is_pk !== "boolean") {
                     attrInfo.errors.push("is_pk no es boolean.");
                 }
-                if (typeof attrDef.is_null !== "boolean") {
+                if (attrDef.is_null !== undefined && typeof attrDef.is_null !== "boolean") {
                     attrInfo.errors.push("is_null no es boolean.");
                 }
-                if (!attrDef.validations || typeof attrDef.validations !== "object") {
-                    attrInfo.errors.push("No tiene validaciones definidas.");
+                if (!attrDef.validation_rules || typeof attrDef.validation_rules !== "object") {
+                    attrInfo.errors.push("No tiene validation_rules definidas.");
                 }
             }
 
@@ -314,7 +313,7 @@ class TestForm {
      * @returns {boolean|string} true si pasa o el codigo de error.
      */
     executePrueba(campo, attrDef, accion, valoresAtributos, numDefTest) {
-        var validationsForAction = attrDef.validations[accion];
+        var validationsForAction = attrDef.validation_rules[accion];
         if (!validationsForAction) return true;
 
         var container = document.getElementById("_test_fields_container_");
@@ -353,39 +352,27 @@ class TestForm {
         for (var validationType in validationsForAction) {
             if (!Object.prototype.hasOwnProperty.call(validationsForAction, validationType)) continue;
             var validationRule = validationsForAction[validationType];
-            var param;
-            var errorMsg;
 
-            if (validationType === "personalized") {
-                if (validationRule.personalize) {
-                    var personalizedResult = this.validateFields.executeValidation(
-                        "personalized", campo, null, this.entityInstance, campo, allValues
-                    );
-                    if (personalizedResult !== true) {
-                        return typeof personalizedResult === "string" ? personalizedResult : validationRule.error_msg;
-                    }
+            // Validacion personalizada del atributo (personalize: true). Se
+            // invoca el metodo <atributo>_personalized_validation() de la
+            // clase de la entidad a traves de Validations.personalized.
+            if (validationType === "personalize") {
+                var personalizedResult = this.validateFields.executeValidation(
+                    "personalize", campo, validationRule, this.entityInstance, campo, allValues
+                );
+                if (personalizedResult !== true) {
+                    return typeof personalizedResult === "string" ? personalizedResult : (campo + "_personalized_KO");
                 }
                 continue;
             }
 
-            if (validationType === "no_file") {
-                errorMsg = validationRule.error_msg;
-                var noFileResult = this.validateFields.executeValidation("no_file", campo, null);
-                if (noFileResult === false) return errorMsg;
-                continue;
-            }
+            // Reglas atomicas: se normaliza la regla (tupla [valor, codigo],
+            // cadena "codigo" para las que no llevan parametro, u objeto
+            // heredado) y se lanza la validacion correspondiente.
+            var regla = Gestor.normalizeValidationRule(validationRule);
+            var validResult = this.validateFields.executeValidation(validationType, campo, regla.param, this.entityInstance, campo, allValues);
 
-            if (typeof validationRule === "object" && validationRule !== null) {
-                param = validationRule.value;
-                errorMsg = validationRule.error_msg;
-            } else {
-                param = validationRule;
-                errorMsg = validationType + "_KO";
-            }
-
-            var validResult = this.validateFields.executeValidation(validationType, campo, param, this.entityInstance, campo, allValues);
-
-            if (validResult === false) return errorMsg;
+            if (validResult === false) return regla.errorMsg || (validationType + "_KO");
             if (typeof validResult === "string") return validResult;
         }
 

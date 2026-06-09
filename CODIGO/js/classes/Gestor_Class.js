@@ -115,10 +115,10 @@ class Gestor {
      */
     comprobarYMostrar(entityName) {
         var errors = [];
-        var faltaEstructura = typeof window[entityName + "_estructura"] === "undefined";
-        var faltaDefTests   = typeof window[entityName + "_def_tests"] === "undefined";
-        var faltaPruebas    = typeof window[entityName + "_pruebas"] === "undefined";
-        var faltaTestSubmit = typeof window[entityName + "_TestSubmit"] === "undefined";
+        var faltaEstructura = typeof Gestor.resolveEstructura(entityName) === "undefined";
+        var faltaDefTests   = typeof Gestor.resolveGlobal(entityName + "_def_tests") === "undefined";
+        var faltaPruebas    = typeof Gestor.resolveGlobal(entityName + "_pruebas") === "undefined";
+        var faltaTestSubmit = typeof Gestor.resolveGlobal(entityName + "_TestSubmit") === "undefined";
 
         if (faltaEstructura) errors.push("No se encontro la variable '" + entityName + "_estructura' (fichero " + entityName + "_estructura.js).");
         if (faltaDefTests)   errors.push("No se encontro la variable '" + entityName + "_def_tests' (fichero " + entityName + "_tests.js).");
@@ -199,7 +199,7 @@ class Gestor {
      * @returns {void}
      */
     showGeneratorModal(entityName) {
-        var pruebas = window[entityName + "_pruebas"];
+        var pruebas = Gestor.resolveGlobal(entityName + "_pruebas");
         if (!Array.isArray(pruebas)) {
             this.showErrorModal(["No se puede generar: falta la variable '" + entityName + "_pruebas'."]);
             return;
@@ -356,5 +356,85 @@ class Gestor {
         if (workArea) {
             workArea.innerHTML = '<div class="welcome-section"><h2>Sistema de Pruebas</h2><p>Seleccione una entidad del menu para iniciar las pruebas de validacion.</p></div>';
         }
+    }
+
+    /**
+     * Localiza una variable/clase global por nombre. Primero se busca en
+     * window (declaraciones var o function, que quedan colgadas de
+     * window) y, si no se encuentra, se resuelve con eval por si se
+     * declaro con const, let o class, que NO se cuelgan de window pero
+     * si son accesibles por su identificador. Es el mismo mecanismo que
+     * usa el ejemplo de la entrega (eval del nombre de la variable).
+     *
+     * @param {string} name nombre de la variable o clase global.
+     * @returns {*} el valor encontrado o undefined.
+     */
+    static resolveGlobal(name) {
+        if (typeof window[name] !== "undefined") return window[name];
+        try {
+            var valor = eval(name);
+            if (typeof valor !== "undefined") return valor;
+        } catch (e) {
+            // identificador no definido
+        }
+        return undefined;
+    }
+
+    /**
+     * Localiza la estructura de una entidad admitiendo los dos nombres
+     * de variable usados en la asignatura: el del enunciado de julio
+     * (nombreentidad_estructura) y el del ejemplo de la entrega
+     * (estructura_nombreentidad).
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @returns {object|undefined} estructura encontrada o undefined.
+     */
+    static resolveEstructura(entityName) {
+        var porEnunciado = Gestor.resolveGlobal(entityName + "_estructura");
+        if (typeof porEnunciado !== "undefined") return porEnunciado;
+        return Gestor.resolveGlobal("estructura_" + entityName);
+    }
+
+    /**
+     * Localiza la clase de una entidad (nombreentidad). Las clases
+     * declaradas con class no quedan colgadas de window, por eso se
+     * resuelve con resolveGlobal (que usa eval como en el ejemplo de la
+     * entrega). Devuelve la clase si existe o undefined si la entidad no
+     * tiene clase (lo que el enunciado permite cuando no hay
+     * validaciones personalizadas).
+     *
+     * @param {string} entityName nombre de la entidad.
+     * @returns {Function|undefined} la clase de la entidad o undefined.
+     */
+    static resolveEntityClass(entityName) {
+        var clase = Gestor.resolveGlobal(entityName);
+        return (typeof clase === "function") ? clase : undefined;
+    }
+
+    /**
+     * Normaliza una regla de validacion al formato de la estructura de
+     * la entrega y devuelve el parametro y el codigo de mensaje.
+     *
+     * Formatos admitidos:
+     *   - Tupla del ejemplo del profesor: [valor, "codigo_mensaje"]
+     *     (type_file es [[mime, ...], "codigo_mensaje"]).
+     *   - Cadena para reglas sin parametro: "codigo_mensaje"
+     *     (no_file, date).
+     *   - Objeto heredado {value, error_msg} por compatibilidad.
+     *
+     * @param {*} rule regla tal y como aparece en validation_rules.
+     * @returns {{param: *, errorMsg: (string|null)}}
+     */
+    static normalizeValidationRule(rule) {
+        if (Array.isArray(rule)) {
+            return { param: rule[0], errorMsg: rule[1] };
+        }
+        if (typeof rule === "string") {
+            return { param: null, errorMsg: rule };
+        }
+        if (rule && typeof rule === "object") {
+            return { param: (rule.value !== undefined ? rule.value : null), errorMsg: rule.error_msg };
+        }
+        return { param: rule, errorMsg: null };
     }
 }

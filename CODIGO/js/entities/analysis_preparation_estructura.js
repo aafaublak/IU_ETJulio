@@ -1,122 +1,123 @@
-var analysis_preparation_estructura = {
-    entity: "analysis_preparation",
-    attributes_list: [
-        "id_analysis_preparation",
-        "name_analysis_preparation",
-        "description_analysis_preparation",
-        "bib_analysis_preparation",
-        "file_analysis_preparation"
-    ],
-    attributes: {
-        id_analysis_preparation: {
-            html: { tag: "input", type: "number" },
-            is_pk: true,
-            is_autoincrement: true,
-            is_null: false,
-            is_unique: false,
-            validations: {
-                SEARCH: {
-                    max_size: { value: 11, error_msg: "id_analysis_preparation_max_size_KO" },
-                    format: { value: "^[0-9]+$", error_msg: "id_analysis_preparation_format_KO" }
-                }
-            }
-        },
-        name_analysis_preparation: {
-            html: { tag: "input", type: "text" },
-            is_pk: false,
-            is_autoincrement: false,
-            is_null: false,
-            is_unique: true,
-            validations: {
-                ADD: {
-                    min_size: { value: 8, error_msg: "name_analysis_preparation_min_size_KO" },
-                    max_size: { value: 100, error_msg: "name_analysis_preparation_max_size_KO" },
-                    format: { value: "^[A-Za-z\\s]+$", error_msg: "name_analysis_preparation_format_KO" }
-                },
-                EDIT: {
-                    min_size: { value: 8, error_msg: "name_analysis_preparation_min_size_KO" },
-                    max_size: { value: 100, error_msg: "name_analysis_preparation_max_size_KO" },
-                    format: { value: "^[A-Za-z\\s]+$", error_msg: "name_analysis_preparation_format_KO" }
-                },
-                SEARCH: {
-                    max_size: { value: 100, error_msg: "name_analysis_preparation_max_size_KO" },
-                    format: { value: "^[A-Za-z\\s]+$", error_msg: "name_analysis_preparation_format_KO" }
-                }
-            }
-        },
-        description_analysis_preparation: {
-            html: { tag: "textarea" },
-            is_pk: false,
-            is_autoincrement: false,
-            is_null: false,
-            is_unique: false,
-            validations: {
-                ADD: {
-                    min_size: { value: 80, error_msg: "description_analysis_preparation_min_size_KO" },
-                    max_size: { value: 5000, error_msg: "description_analysis_preparation_max_size_KO" },
-                    format: { value: "^[A-Za-z\\s]+$", error_msg: "description_analysis_preparation_format_KO" }
-                },
-                EDIT: {
-                    min_size: { value: 80, error_msg: "description_analysis_preparation_min_size_KO" },
-                    max_size: { value: 5000, error_msg: "description_analysis_preparation_max_size_KO" },
-                    format: { value: "^[A-Za-z\\s]+$", error_msg: "description_analysis_preparation_format_KO" }
-                },
-                SEARCH: {
-                    max_size: { value: 5000, error_msg: "description_analysis_preparation_max_size_KO" },
-                    format: { value: "^[A-Za-z\\s]+$", error_msg: "description_analysis_preparation_format_KO" }
-                }
-            }
-        },
-        bib_analysis_preparation: {
-            html: { tag: "input", type: "text" },
-            is_pk: false,
-            is_autoincrement: false,
-            is_null: false,
-            is_unique: false,
-            validations: {
-                ADD: {
-                    min_size: { value: 6, error_msg: "bib_analysis_preparation_min_size_KO" },
-                    max_size: { value: 200, error_msg: "bib_analysis_preparation_max_size_KO" },
-                    format: { value: "^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s.,;:()\\[\\]¡!¿?\"-]+$", error_msg: "bib_analysis_preparation_format_KO" }
-                },
-                EDIT: {
-                    min_size: { value: 6, error_msg: "bib_analysis_preparation_min_size_KO" },
-                    max_size: { value: 200, error_msg: "bib_analysis_preparation_max_size_KO" },
-                    format: { value: "^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s.,;:()\\[\\]¡!¿?\"-]+$", error_msg: "bib_analysis_preparation_format_KO" }
-                },
-                SEARCH: {
-                    max_size: { value: 200, error_msg: "bib_analysis_preparation_max_size_KO" },
-                    format: { value: "^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s.,;:()\\[\\]¡!¿?\"-]+$", error_msg: "bib_analysis_preparation_format_KO" }
-                }
-            }
-        },
-        file_analysis_preparation: {
-            html: { tag: "input", type: "file" },
-            is_pk: false,
-            is_autoincrement: false,
-            is_null: false,
-            is_unique: false,
-            validations: {
-                ADD: {
-                    no_file: { error_msg: "file_analysis_preparation_no_file_KO" },
-                    min_size: { value: 7, error_msg: "file_analysis_preparation_min_size_KO" },
-                    max_size: { value: 100, error_msg: "file_analysis_preparation_max_size_KO" },
-                    format_name_file: { value: "^[a-zA-Z.]+$", error_msg: "file_analysis_preparation_format_name_file_KO" },
-                    type_file: { value: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"], error_msg: "file_analysis_preparation_type_file_KO" },
-                    max_size_file: { value: 2000000, error_msg: "file_analysis_preparation_max_size_file_KO" }
-                },
-                EDIT: {
-                    min_size: { value: 7, error_msg: "file_analysis_preparation_min_size_KO" },
-                    max_size: { value: 100, error_msg: "file_analysis_preparation_max_size_KO" },
-                    format_name_file: { value: "^[a-zA-Z.]+$", error_msg: "file_analysis_preparation_format_name_file_KO" },
-                    type_file: { value: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"], error_msg: "file_analysis_preparation_type_file_KO" },
-                    max_size_file: { value: 2000000, error_msg: "file_analysis_preparation_max_size_file_KO" }
-                },
-                SEARCH: {
-                    max_size: { value: 100, error_msg: "file_analysis_preparation_max_size_KO" },
-                    format: { value: "^[a-zA-Z.]+$", error_msg: "file_analysis_preparation_format_KO" }
-                }
-            }
-        }
-    }
+/**
+ * Estructura de la entidad analysis_preparation.
+ *
+ * Sigue el formato de estructura de datos de la entrega: variable
+ * estructura_<entidad>, attributes_list y attributes con validation_rules
+ * cuyas reglas son TUPLAS [valor, "codigo_mensaje"] (no_file solo lleva
+ * el "codigo_mensaje").
+ *
+ * Se declara con var para que cuelgue de window y se expone tambien el
+ * alias analysis_preparation_estructura (nombre nombreentidad_estructura
+ * del enunciado de julio).
+ */
+var estructura_analysis_preparation = {
+	attributes_list: [
+		"id_analysis_preparation",
+		"name_analysis_preparation",
+		"description_analysis_preparation",
+		"bib_analysis_preparation",
+		"file_analysis_preparation"
+	],
+	attributes: {
+		id_analysis_preparation: {
+			html: { tag: "input", type: "number", component_visible_size: 7 },
+			is_pk: true,
+			is_autoincrement: true,
+			is_null: false,
+			validation_rules: {
+				SEARCH: {
+					max_size: [11, "id_analysis_preparation_max_size_KO"],
+					format: ["^[0-9]+$", "id_analysis_preparation_format_KO"]
+				}
+			}
+		},
+		name_analysis_preparation: {
+			html: { tag: "input", type: "text", component_visible_size: 30 },
+			is_null: false,
+			validation_rules: {
+				ADD: {
+					min_size: [8, "name_analysis_preparation_min_size_KO"],
+					max_size: [100, "name_analysis_preparation_max_size_KO"],
+					format: ["^[A-Za-z\\s]+$", "name_analysis_preparation_format_KO"]
+				},
+				EDIT: {
+					min_size: [8, "name_analysis_preparation_min_size_KO"],
+					max_size: [100, "name_analysis_preparation_max_size_KO"],
+					format: ["^[A-Za-z\\s]+$", "name_analysis_preparation_format_KO"]
+				},
+				SEARCH: {
+					max_size: [100, "name_analysis_preparation_max_size_KO"],
+					format: ["^[A-Za-z\\s]+$", "name_analysis_preparation_format_KO"]
+				}
+			}
+		},
+		description_analysis_preparation: {
+			html: { tag: "textarea", rows: 10, columns: 100, component_visible_size: 100 },
+			is_null: false,
+			validation_rules: {
+				ADD: {
+					min_size: [80, "description_analysis_preparation_min_size_KO"],
+					max_size: [5000, "description_analysis_preparation_max_size_KO"],
+					format: ["^[A-Za-z\\s]+$", "description_analysis_preparation_format_KO"]
+				},
+				EDIT: {
+					min_size: [80, "description_analysis_preparation_min_size_KO"],
+					max_size: [5000, "description_analysis_preparation_max_size_KO"],
+					format: ["^[A-Za-z\\s]+$", "description_analysis_preparation_format_KO"]
+				},
+				SEARCH: {
+					max_size: [5000, "description_analysis_preparation_max_size_KO"],
+					format: ["^[A-Za-z\\s]+$", "description_analysis_preparation_format_KO"]
+				}
+			}
+		},
+		bib_analysis_preparation: {
+			html: { tag: "input", type: "text", component_visible_size: 50 },
+			is_null: false,
+			validation_rules: {
+				ADD: {
+					min_size: [6, "bib_analysis_preparation_min_size_KO"],
+					max_size: [200, "bib_analysis_preparation_max_size_KO"],
+					format: ["^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s.,;:()\\[\\]¡!¿?\"-]+$", "bib_analysis_preparation_format_KO"]
+				},
+				EDIT: {
+					min_size: [6, "bib_analysis_preparation_min_size_KO"],
+					max_size: [200, "bib_analysis_preparation_max_size_KO"],
+					format: ["^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s.,;:()\\[\\]¡!¿?\"-]+$", "bib_analysis_preparation_format_KO"]
+				},
+				SEARCH: {
+					max_size: [200, "bib_analysis_preparation_max_size_KO"],
+					format: ["^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s.,;:()\\[\\]¡!¿?\"-]+$", "bib_analysis_preparation_format_KO"]
+				}
+			}
+		},
+		file_analysis_preparation: {
+			html: { tag: "input", type: "file", multiple: false, component_visible_size: 7 },
+			is_null: false,
+			validation_rules: {
+				ADD: {
+					no_file: "file_analysis_preparation_no_file_KO",
+					min_size: [7, "file_analysis_preparation_min_size_KO"],
+					max_size: [100, "file_analysis_preparation_max_size_KO"],
+					format_name_file: ["^[a-zA-Z.]+$", "file_analysis_preparation_format_name_file_KO"],
+					type_file: [["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"], "file_analysis_preparation_type_file_KO"],
+					max_size_file: [2000000, "file_analysis_preparation_max_size_file_KO"]
+				},
+				EDIT: {
+					min_size: [7, "file_analysis_preparation_min_size_KO"],
+					max_size: [100, "file_analysis_preparation_max_size_KO"],
+					format_name_file: ["^[a-zA-Z.]+$", "file_analysis_preparation_format_name_file_KO"],
+					type_file: [["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"], "file_analysis_preparation_type_file_KO"],
+					max_size_file: [2000000, "file_analysis_preparation_max_size_file_KO"]
+				},
+				SEARCH: {
+					max_size: [100, "file_analysis_preparation_max_size_KO"],
+					format: ["^[a-zA-Z.]+$", "file_analysis_preparation_format_KO"]
+				}
+			}
+		}
+	}
 };
+
+// Alias con el nombre nombreentidad_estructura citado en el enunciado de julio.
+var analysis_preparation_estructura = estructura_analysis_preparation;

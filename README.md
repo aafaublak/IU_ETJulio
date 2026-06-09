@@ -8,8 +8,10 @@ El objetivo no es construir formularios para el usuario final, sino ofrecer una 
 
 ## Estructura de directorios
 
+> En la entrega oficial, `NombreAlumno` se sustituye por el nombre real del alumno en el directorio raíz y en el fichero de datos.
+
 ```text
-Julio_AlbertoAndresFaublakAlvarez/
+Julio_NombreAlumno/
 └── CODIGO/
     ├── index.html                  Página principal
     ├── API.html                    Documentación de clases y diagramas de flujo
@@ -19,7 +21,7 @@ Julio_AlbertoAndresFaublakAlvarez/
     └── js/
         ├── data/
         │   ├── menu_entidades.js               Lista de entidades del menú
-        │   └── Julio_Datos_AlbertoAndresFaublakAlvarez.js  Datos de la entrega
+        │   └── Julio_Datos_NombreAlumno.js     Datos de la entrega (Entrega, DNI, nombre, horas)
         ├── classes/
         │   ├── Validations_Class.js            Validaciones atómicas
         │   ├── ValidateFieldsForm_Class.js     Creación de campos y ejecución de validaciones
@@ -84,7 +86,7 @@ Contiene todas las validaciones atómicas. Cada método recibe el `id` del eleme
 | `format_name_file(elementId, regex)` | El nombre del fichero casa con la regex |
 | `type_file(elementId, tipos)` | El MIME type está en la lista de tipos permitidos |
 | `max_size_file(elementId, n)` | El tamaño del fichero en bytes <= n |
-| `personalized(elementId, instancia, attrName, allValues)` | Llama a `attrName_personalized_validation` en la clase de la entidad |
+| `personalized(elementId, entityInstance, allValues)` | Deriva el método `<atributo>_personalized_validation` del nombre del atributo y lo invoca en la clase de la entidad con todos los valores del formulario |
 
 ### Gestor (`Gestor_Class.js`)
 
@@ -125,25 +127,33 @@ La validación atómica `date()` no impone ningún rango de años: acepta cualqu
 
 ### `nombreentidad_estructura.js`
 
+Se sigue el formato de la estructura de datos de la entrega: la variable principal se declara como `estructura_nombreentidad` (con un alias `nombreentidad_estructura` para el nombre que cita el enunciado de julio). Cada regla de validación con parámetro es una **tupla** `[valor, "codigo_mensaje"]`; las reglas sin parámetro (`no_file`, `date`) se indican solo con su `"codigo_mensaje"`, y las personalizadas con `personalize: true`.
+
 ```js
-var nombreentidad_estructura = {
-    entity: "nombreentidad",
+var estructura_nombreentidad = {
     attributes_list: ["attr1", "attr2", ...],
     attributes: {
         attr1: {
-            html: { tag: "input", type: "text" },
-            is_pk: false,
-            is_autoincrement: false,
+            html: { tag: "input", type: "text", component_visible_size: 30 },
+            is_pk: true,            // solo en la clave primaria
+            is_autoincrement: true, // solo en la clave primaria
             is_null: false,
-            is_unique: false,
-            validations: {
-                ADD:    { min_size: { value: 8, error_msg: "attr1_min_size_KO" }, ... },
-                EDIT:   { ... },
-                SEARCH: { ... }
+            validation_rules: {
+                ADD: {
+                    min_size: [8, "attr1_min_size_KO"],
+                    max_size: [100, "attr1_max_size_KO"],
+                    format: ["^[A-Za-z\\s]+$", "attr1_format_KO"],
+                    personalize: true   // invoca attr1_personalized_validation()
+                },
+                EDIT:   { /* ... */ },
+                SEARCH: { /* ... */ }
             }
         }
     }
 };
+
+// Alias con el nombre citado en el enunciado de julio.
+var nombreentidad_estructura = estructura_nombreentidad;
 ```
 
 ### `nombreentidad_tests.js`
@@ -164,7 +174,7 @@ Array `nombreentidad_TestSubmit` con pruebas de formulario completo — `[entida
 1. Crear `js/entities/nuevaentidad_estructura.js` con la definición de atributos.
 2. Crear `js/tests/nuevaentidad_tests.js` con las definiciones de test y las pruebas.
 3. Crear `js/tests/nuevaentidad_TestSubmit.js` con las pruebas de submit.
-4. Si alguna validación es personalizada (`personalize: true`), crear `js/classes/nuevaentidad_Class.js` con los métodos `nombreatributo_personalized_validation`.
+4. Si alguna validación es personalizada (`personalize: true` dentro de `validation_rules`), crear `js/classes/nuevaentidad_Class.js` con el método `nombreatributo_personalized_validation(allValues)`. El sistema deriva el nombre del método del nombre del atributo.
 5. Añadir `"nuevaentidad"` al array `menu_entidades` en `js/data/menu_entidades.js`.
 
 No es necesario modificar `index.html`.

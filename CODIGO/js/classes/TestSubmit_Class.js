@@ -98,13 +98,13 @@ class TestSubmit {
      */
     constructor(entityName) {
         this.entityName = entityName;
-        this.estructura = window[entityName + "_estructura"];
-        this.testSubmitData = window[entityName + "_TestSubmit"];
+        this.estructura = Gestor.resolveEstructura(entityName);
+        this.testSubmitData = Gestor.resolveGlobal(entityName + "_TestSubmit");
         this.entityInstance = null;
         this.validateFields = new ValidateFieldsForm();
 
         try {
-            var EntityClass = window[entityName];
+            var EntityClass = Gestor.resolveEntityClass(entityName);
             if (typeof EntityClass === "function") {
                 this.entityInstance = new EntityClass();
             }
@@ -293,11 +293,11 @@ class TestSubmit {
 
         attributesList.forEach(function(attrName) {
             var attrDef = self.estructura.attributes[attrName];
-            if (!attrDef || !attrDef.validations || !attrDef.validations[accion]) return;
+            if (!attrDef || !attrDef.validation_rules || !attrDef.validation_rules[accion]) return;
 
             if (accion === "ADD" && attrDef.is_pk && attrDef.is_autoincrement) return;
 
-            var validationsForAction = attrDef.validations[accion];
+            var validationsForAction = attrDef.validation_rules[accion];
             var elementValue = allValues[attrName];
 
             if (accion === "SEARCH") {
@@ -307,40 +307,28 @@ class TestSubmit {
             for (var validationType in validationsForAction) {
                 if (!Object.prototype.hasOwnProperty.call(validationsForAction, validationType)) continue;
                 var validationRule = validationsForAction[validationType];
-                var param;
-                var errorMsg;
 
-                if (validationType === "personalized") {
-                    if (validationRule.personalize) {
-                        var personalizedResult = self.validateFields.executeValidation(
-                            "personalized", attrName, null, self.entityInstance, attrName, allValues
-                        );
-                        if (personalizedResult !== true && typeof personalizedResult === "string") {
-                            errors.push(personalizedResult);
-                        }
+                // Validacion personalizada del atributo (personalize: true). Se
+                // invoca el metodo <atributo>_personalized_validation() de la
+                // clase de la entidad a traves de Validations.personalized.
+                if (validationType === "personalize") {
+                    var personalizedResult = self.validateFields.executeValidation(
+                        "personalize", attrName, validationRule, self.entityInstance, attrName, allValues
+                    );
+                    if (personalizedResult !== true) {
+                        errors.push(typeof personalizedResult === "string" ? personalizedResult : (attrName + "_personalized_KO"));
                     }
                     continue;
                 }
 
-                if (validationType === "no_file") {
-                    errorMsg = validationRule.error_msg;
-                    var noFileResult = self.validateFields.executeValidation("no_file", attrName, null);
-                    if (noFileResult === false) errors.push(errorMsg);
-                    continue;
-                }
-
-                if (typeof validationRule === "object" && validationRule !== null) {
-                    param = validationRule.value;
-                    errorMsg = validationRule.error_msg;
-                } else {
-                    param = validationRule;
-                    errorMsg = validationType + "_KO";
-                }
-
-                var validResult = self.validateFields.executeValidation(validationType, attrName, param, self.entityInstance, attrName, allValues);
+                // Reglas atomicas: se normaliza la regla (tupla [valor, codigo],
+                // cadena "codigo" sin parametro, u objeto heredado) y se lanza
+                // la validacion correspondiente acumulando todos los errores.
+                var regla = Gestor.normalizeValidationRule(validationRule);
+                var validResult = self.validateFields.executeValidation(validationType, attrName, regla.param, self.entityInstance, attrName, allValues);
 
                 if (validResult === false) {
-                    errors.push(errorMsg);
+                    errors.push(regla.errorMsg || (validationType + "_KO"));
                 } else if (typeof validResult === "string") {
                     errors.push(validResult);
                 }

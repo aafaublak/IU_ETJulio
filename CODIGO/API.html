@@ -159,14 +159,13 @@
                 </div>
 
                 <div class="api-method">
-                    <strong>personalized(elementId, entityInstance, attrName, allValues)</strong>
-                    <p>Ejecuta una validacion personalizada definida en la clase de la entidad. Invoca el metodo <code>nombreAtributo_personalized_validation(value, allValues)</code> sobre <code>entityInstance</code>.</p>
+                    <strong>personalized(elementId, entityInstance, allValues)</strong>
+                    <p>Ejecuta la validacion personalizada de un atributo que en la estructura lleva <code>personalize: true</code>. Tal como indica el enunciado, el metodo a invocar se deriva del nombre del atributo: <code>&lt;atributo&gt;_personalized_validation()</code>, y se le pasa el objeto <code>allValues</code> con todos los valores del formulario para permitir validaciones cruzadas. Si la entidad no tiene clase o el metodo no existe devuelve <code>true</code> (el enunciado permite que no exista clase cuando no hay validaciones personalizadas).</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
-                            <tr><td>elementId</td><td>string</td><td>ID del elemento HTML</td></tr>
+                            <tr><td>elementId</td><td>string</td><td>ID/nombre del atributo; de el se deriva el metodo <code>&lt;atributo&gt;_personalized_validation</code></td></tr>
                             <tr><td>entityInstance</td><td>object</td><td>Instancia de la clase de la entidad</td></tr>
-                            <tr><td>attrName</td><td>string</td><td>Nombre del atributo</td></tr>
                             <tr><td>allValues</td><td>object</td><td>Todos los valores del formulario</td></tr>
                         </tbody>
                     </table>
@@ -185,7 +184,7 @@
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
                             <tr><td>attrName</td><td>string</td><td>Nombre del atributo (usado como id y name del elemento creado).</td></tr>
-                            <tr><td>attrDef</td><td>object</td><td>Definicion del atributo (campos <code>html</code>, <code>validations</code>...).</td></tr>
+                            <tr><td>attrDef</td><td>object</td><td>Definicion del atributo (campos <code>html</code>, <code>validation_rules</code>...).</td></tr>
                             <tr><td>action</td><td>string</td><td>Accion en curso (ADD, EDIT, SEARCH). Opcional; permite decidir si un campo file se trata como texto para esa accion.</td></tr>
                         </tbody>
                     </table>
@@ -251,16 +250,15 @@
                 </div>
 
                 <div class="api-method">
-                    <strong>end_date_project_personalized_validation(value, allValues)</strong>
-                    <p>Validacion personalizada para <code>end_date_project</code>. Comprueba que la fecha de fin sea posterior a la fecha de inicio. La validez de la fecha como tal (dias por mes, bisiestos) la garantiza la validacion atomica <code>date()</code>, que se ejecuta antes en la cadena de validaciones de la estructura.</p>
+                    <strong>end_date_project_personalized_validation(allValues)</strong>
+                    <p>Validacion personalizada para <code>end_date_project</code> (declarada con <code>personalize: true</code> en la estructura). Recibe el objeto con todos los valores del formulario y de el lee <code>end_date_project</code> y <code>start_date_project</code>. Comprueba que la fecha de fin sea una fecha real y posterior a la de inicio. Si <code>start_date_project</code> no llega o no es una fecha valida, solo se exige que la de fin sea una fecha real.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
-                            <tr><td>value</td><td>string</td><td>Valor de la fecha de fin en formato dd/mm/aaaa.</td></tr>
-                            <tr><td>allValues</td><td>object</td><td>Resto de valores del formulario; se espera <code>start_date_project</code>.</td></tr>
+                            <tr><td>allValues</td><td>object</td><td>Valores del formulario; se esperan <code>end_date_project</code> y <code>start_date_project</code> en formato dd/mm/aaaa.</td></tr>
                         </tbody>
                     </table>
-                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si la fecha de fin es posterior a la de inicio, o <code>end_date_project_personalized_KO</code>.</p>
+                    <p><strong>Retorna:</strong> <code>boolean|string</code> &mdash; <code>true</code> si la fecha de fin es una fecha real posterior a la de inicio, o <code>end_date_project_personalized_KO</code>.</p>
                 </div>
             </div>
         </div>
@@ -498,6 +496,54 @@
                     <strong>hideTestButtons()</strong>
                     <p>Oculta los botones de test y muestra el mensaje de bienvenida.</p>
                 </div>
+
+                <div class="api-method">
+                    <strong>static resolveGlobal(name)</strong>
+                    <p>Localiza una variable o clase global por nombre: primero en <code>window</code> (declaraciones <code>var</code>/<code>function</code>) y, si no, mediante <code>eval</code> del identificador (para declaraciones <code>const</code>, <code>let</code> o <code>class</code>, que no quedan colgadas de <code>window</code>). Es el mismo mecanismo de resolucion que usa el ejemplo de la entrega.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>name</td><td>string</td><td>Nombre de la variable o clase global.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>*</code> &mdash; el valor encontrado o <code>undefined</code>.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>static resolveEstructura(entityName)</strong>
+                    <p>Localiza la estructura de una entidad admitiendo los dos nombres de variable usados en la asignatura: el del enunciado de julio (<code>nombreentidad_estructura</code>) y el del ejemplo de la entrega (<code>estructura_nombreentidad</code>).</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>object|undefined</code> &mdash; la estructura de la entidad o <code>undefined</code>.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>static resolveEntityClass(entityName)</strong>
+                    <p>Localiza la clase de una entidad (<code>nombreentidad</code>). Como las clases declaradas con <code>class</code> no quedan colgadas de <code>window</code>, se resuelve con <code>resolveGlobal</code> (que usa <code>eval</code>). Devuelve <code>undefined</code> si la entidad no tiene clase, lo que el enunciado permite cuando no hay validaciones personalizadas.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>entityName</td><td>string</td><td>Nombre de la entidad.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>Function|undefined</code> &mdash; la clase de la entidad o <code>undefined</code>.</p>
+                </div>
+
+                <div class="api-method">
+                    <strong>static normalizeValidationRule(rule)</strong>
+                    <p>Normaliza una regla de <code>validation_rules</code> al formato de la estructura de la entrega y devuelve el parametro y el codigo de mensaje. Admite la tupla del ejemplo del profesor <code>[valor, "codigo"]</code> (en <code>type_file</code> es <code>[[mime, ...], "codigo"]</code>), la cadena <code>"codigo"</code> para reglas sin parametro (<code>no_file</code>, <code>date</code>) y, por compatibilidad, el objeto <code>{value, error_msg}</code>.</p>
+                    <table class="api-param-table">
+                        <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
+                        <tbody>
+                            <tr><td>rule</td><td>Array|string|object</td><td>Regla tal y como aparece en <code>validation_rules</code>.</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Retorna:</strong> <code>object</code> &mdash; <code>{ param, errorMsg }</code>.</p>
+                </div>
             </div>
         </div>
 
@@ -536,7 +582,7 @@
 
                 <div class="api-method">
                     <strong>constructor(entityName)</strong>
-                    <p>Lee de <code>window</code> la estructura y el array <code>_TestSubmit</code> de la entidad, e instancia la clase de la entidad (si existe) para poder ejecutar las validaciones personalizadas.</p>
+                    <p>Resuelve la estructura de la entidad con <code>Gestor.resolveEstructura</code> (admite los nombres <code>nombreentidad_estructura</code> y <code>estructura_nombreentidad</code>) y el array <code>_TestSubmit</code> con <code>Gestor.resolveGlobal</code>, e instancia la clase de la entidad (si existe) para poder ejecutar las validaciones personalizadas.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -780,11 +826,11 @@
                             <tr><td>max_size</td><td>readValue.length &lt;= param (false si no existe el elemento)</td><td>boolean</td></tr>
                             <tr><td>format</td><td>RegExp(param).test(readValue) &mdash; false si no hay elemento o regex vacia</td><td>boolean</td></tr>
                             <tr><td>date</td><td>parsea readValue como dd/mm/aaaa, comprueba dias por mes y bisiestos, sin restriccion de anos</td><td>boolean</td></tr>
-                            <tr><td>no_file</td><td>readFile !== null</td><td>boolean</td></tr>
-                            <tr><td>format_name_file</td><td>RegExp(param).test(readFile.name)</td><td>boolean</td></tr>
-                            <tr><td>type_file</td><td>param.indexOf(readFile.type) !== -1</td><td>boolean</td></tr>
-                            <tr><td>max_size_file</td><td>readFile.size &lt;= param</td><td>boolean</td></tr>
-                            <tr><td>personalized</td><td>entityInstance[attr + "_personalized_validation"](readValue, allValues)</td><td>boolean | string</td></tr>
+                            <tr><td>no_file</td><td>readValue !== "" (true si hay nombre de fichero; false si esta vacio o no existe)</td><td>boolean</td></tr>
+                            <tr><td>format_name_file</td><td>RegExp(param).test(readValue) &mdash; lee el nombre del fichero con readValue</td><td>boolean</td></tr>
+                            <tr><td>type_file</td><td>param.indexOf(readFile.type) !== -1 (necesita el objeto File)</td><td>boolean</td></tr>
+                            <tr><td>max_size_file</td><td>readFile.size &lt;= param (necesita el objeto File)</td><td>boolean</td></tr>
+                            <tr><td>personalized</td><td>deriva el metodo &lt;atributo&gt;_personalized_validation de la clase de la entidad y lo invoca con allValues</td><td>boolean | string</td></tr>
                         </tbody>
                     </table>
                 </div>
