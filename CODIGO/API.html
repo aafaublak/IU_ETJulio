@@ -147,7 +147,7 @@
 
                 <div class="api-method">
                     <strong>max_size_file(elementId, maxSize)</strong>
-                    <p>Valida que el tamano del archivo no exceda el maximo en bytes.</p>
+                    <p>Valida que el tamano del archivo sea estrictamente <strong>menor</strong> que el maximo en bytes. El enunciado exige "tamano de fichero menor de N bytes", por lo que un fichero de exactamente <code>maxSize</code> bytes NO es valido.</p>
                     <table class="api-param-table">
                         <thead><tr><th>Parametro</th><th>Tipo</th><th>Descripcion</th></tr></thead>
                         <tbody>
@@ -155,7 +155,7 @@
                             <tr><td>maxSize</td><td>number</td><td>Tamano maximo en bytes</td></tr>
                         </tbody>
                     </table>
-                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el archivo no supera el tamano</p>
+                    <p><strong>Retorna:</strong> <code>boolean</code> &mdash; true si el tamano del archivo es estrictamente menor que maxSize</p>
                 </div>
 
                 <div class="api-method">
@@ -829,7 +829,7 @@
                             <tr><td>no_file</td><td>readValue !== "" (true si hay nombre de fichero; false si esta vacio o no existe)</td><td>boolean</td></tr>
                             <tr><td>format_name_file</td><td>RegExp(param).test(readValue) &mdash; lee el nombre del fichero con readValue</td><td>boolean</td></tr>
                             <tr><td>type_file</td><td>param.indexOf(readFile.type) !== -1 (necesita el objeto File)</td><td>boolean</td></tr>
-                            <tr><td>max_size_file</td><td>readFile.size &lt;= param (necesita el objeto File)</td><td>boolean</td></tr>
+                            <tr><td>max_size_file</td><td>readFile.size &lt; param (estrictamente menor, "menor de"; necesita el objeto File)</td><td>boolean</td></tr>
                             <tr><td>personalized</td><td>deriva el metodo &lt;atributo&gt;_personalized_validation de la clase de la entidad y lo invoca con allValues</td><td>boolean | string</td></tr>
                         </tbody>
                     </table>

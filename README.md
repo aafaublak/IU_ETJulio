@@ -85,7 +85,7 @@ Contiene todas las validaciones atómicas. Cada método recibe el `id` del eleme
 | `no_file(elementId)` | Hay fichero seleccionado |
 | `format_name_file(elementId, regex)` | El nombre del fichero casa con la regex |
 | `type_file(elementId, tipos)` | El MIME type está en la lista de tipos permitidos |
-| `max_size_file(elementId, n)` | El tamaño del fichero en bytes <= n |
+| `max_size_file(elementId, n)` | El tamaño del fichero en bytes es estrictamente menor que n ("menor de", según el enunciado) |
 | `personalized(elementId, entityInstance, allValues)` | Deriva el método `<atributo>_personalized_validation` del nombre del atributo y lo invoca en la clase de la entidad con todos los valores del formulario |
 
 ### Gestor (`Gestor_Class.js`)
@@ -194,3 +194,4 @@ Disponible en `CODIGO/API.html` (enlace en la cabecera de la aplicación). Inclu
 - **Validez de fechas en `date()` y validación cruzada en `project_Class.js`**: la atómica `date()` comprueba que `dd/mm/aaaa` exista realmente en el calendario (días por mes y bisiestos); la comparación `end_date_project > start_date_project` no puede ser atómica porque depende de otro atributo, así que vive en `project_Class.js` como validación personalizada (`personalize: true` en la estructura). Esto sirve además como ejemplo real de cómo cablear una clase de entidad.
 - **Compactación de valores repetidos en el detalle**: cuando una prueba lleva un valor largo (por ejemplo, una cadena de 200 caracteres iguales para forzar `max_size_KO`), la tabla de detalle lo muestra como `"A".repeat(200)` para que la columna no obligue a desplazarse horizontalmente. Las cadenas heterogéneas se muestran entre comillas tal cual.
 - **`CheckSubmit` acumula todos los errores**: no se aborta al primer fallo. Devuelve `true` si todo es válido o un array con todos los códigos de error encontrados, para que el usuario vea cada problema en una sola pasada. No realiza llamada al backend: el proyecto se queda en la verificación previa.
+- **Tamaño de fichero "menor de" (límite exclusivo)**: el enunciado pide "tamaño de fichero menor de N bytes", por lo que `max_size_file` usa comparación estricta (`file.size < N`). Un fichero de exactamente N bytes se considera inválido. Las pruebas de valor límite lo reflejan: `N-1` bytes es válido y `N` bytes da error (200000 en `characteristic`; 2000000 en `analysis_preparation` y `project`).

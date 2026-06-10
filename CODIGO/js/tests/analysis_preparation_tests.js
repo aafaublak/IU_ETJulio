@@ -75,7 +75,24 @@ var analysis_preparation_def_tests = [
     // === file_analysis_preparation - SEARCH (modo texto) ===
     ["analysis_preparation", "file_analysis_preparation", "input", 50, "Validar max_size de file en SEARCH", "SEARCH", "file_analysis_preparation_max_size_KO", "El nombre del fichero supera el tamano maximo en busqueda"],
     ["analysis_preparation", "file_analysis_preparation", "input", 51, "Validar format de file en SEARCH", "SEARCH", "file_analysis_preparation_format_KO", "Nombre de fichero con formato incorrecto en busqueda"],
-    ["analysis_preparation", "file_analysis_preparation", "input", 52, "Validar file correcto en SEARCH", "SEARCH", true, "Busqueda de fichero correcta"]
+    ["analysis_preparation", "file_analysis_preparation", "input", 52, "Validar file correcto en SEARCH", "SEARCH", true, "Busqueda de fichero correcta"],
+
+    // === Ampliacion caja negra: valores limite, clases invalidas adicionales y cobertura MIME ===
+    ["analysis_preparation", "id_analysis_preparation", "input", 53, "Validar id en limite exacto de max_size (11 digitos) en SEARCH", "SEARCH", true, "ID en el limite maximo permitido"],
+    ["analysis_preparation", "name_analysis_preparation", "input", 54, "Validar name en limite exacto de min_size (8) en ADD", "ADD", true, "Nombre en el limite minimo permitido"],
+    ["analysis_preparation", "name_analysis_preparation", "input", 55, "Validar name en limite exacto de max_size (100) en ADD", "ADD", true, "Nombre en el limite maximo permitido"],
+    ["analysis_preparation", "name_analysis_preparation", "input", 56, "Validar name con simbolos no permitidos en ADD", "ADD", "name_analysis_preparation_format_KO", "Nombre con simbolos especiales"],
+    ["analysis_preparation", "description_analysis_preparation", "textarea", 57, "Validar description en limite exacto de min_size (80) en ADD", "ADD", true, "Descripcion en el limite minimo permitido"],
+    ["analysis_preparation", "description_analysis_preparation", "textarea", 58, "Validar description en limite exacto de max_size (5000) en ADD", "ADD", true, "Descripcion en el limite maximo permitido"],
+    ["analysis_preparation", "description_analysis_preparation", "textarea", 59, "Validar description con digitos no permitidos en ADD", "ADD", "description_analysis_preparation_format_KO", "Descripcion con digitos"],
+    ["analysis_preparation", "bib_analysis_preparation", "input", 60, "Validar bib en limite exacto de min_size (6) en ADD", "ADD", true, "Bibliografia en el limite minimo permitido"],
+    ["analysis_preparation", "bib_analysis_preparation", "input", 61, "Validar bib en limite exacto de max_size (200) en ADD", "ADD", true, "Bibliografia en el limite maximo permitido"],
+    ["analysis_preparation", "bib_analysis_preparation", "input", 62, "Validar bib con digitos no permitidos en ADD", "ADD", "bib_analysis_preparation_format_KO", "Bibliografia con digitos"],
+    ["analysis_preparation", "file_analysis_preparation", "file", 63, "Validar file con tipo MIME doc en ADD", "ADD", true, "Fichero .doc valido"],
+    ["analysis_preparation", "file_analysis_preparation", "file", 64, "Validar file con tipo MIME docx en ADD", "ADD", true, "Fichero .docx valido"],
+    ["analysis_preparation", "file_analysis_preparation", "file", 65, "Validar file justo por debajo del limite de max_size_file (1999999 bytes, menor de 2000000) en ADD", "ADD", true, "Fichero por debajo del limite de tamano (valido)"],
+    ["analysis_preparation", "file_analysis_preparation", "file", 66, "Validar file en limite exacto de min_size del nombre (7) en ADD", "ADD", true, "Nombre de fichero en el limite minimo"],
+    ["analysis_preparation", "file_analysis_preparation", "file", 67, "Validar file en limite exacto de max_size del nombre (100) en ADD", "ADD", true, "Nombre de fichero en el limite maximo"]
 ];
 
 var analysis_preparation_pruebas = [
@@ -182,5 +199,65 @@ var analysis_preparation_pruebas = [
     ["analysis_preparation", "file_analysis_preparation", 51, 101, "SEARCH", {"file_analysis_preparation": "archivo 123.pdf"}, "file_analysis_preparation_format_KO"],
     ["analysis_preparation", "file_analysis_preparation", 51, 102, "SEARCH", {"file_analysis_preparation": "documento.pdf"}, true],
     ["analysis_preparation", "file_analysis_preparation", 52, 103, "SEARCH", {"file_analysis_preparation": "documento.pdf"}, true],
-    ["analysis_preparation", "file_analysis_preparation", 52, 104, "SEARCH", {"file_analysis_preparation": "archivo 1.pdf"}, "file_analysis_preparation_format_KO"]
+    ["analysis_preparation", "file_analysis_preparation", 52, 104, "SEARCH", {"file_analysis_preparation": "archivo 1.pdf"}, "file_analysis_preparation_format_KO"],
+
+    // Ampliacion: id_analysis_preparation en limite exacto de max_size (11 digitos)
+    ["analysis_preparation", "id_analysis_preparation", 53, 105, "SEARCH", {"id_analysis_preparation": "12345678901"}, true],
+    ["analysis_preparation", "id_analysis_preparation", 53, 106, "SEARCH", {"id_analysis_preparation": "123456789012"}, "id_analysis_preparation_max_size_KO"],
+
+    // Ampliacion: name_analysis_preparation en limite exacto de min_size (8)
+    ["analysis_preparation", "name_analysis_preparation", 54, 107, "ADD", {"name_analysis_preparation": "Caracter"}, true],
+    ["analysis_preparation", "name_analysis_preparation", 54, 108, "ADD", {"name_analysis_preparation": "Caracte"}, "name_analysis_preparation_min_size_KO"],
+
+    // Ampliacion: name_analysis_preparation en limite exacto de max_size (100)
+    ["analysis_preparation", "name_analysis_preparation", 55, 109, "ADD", {"name_analysis_preparation": "A".repeat(100)}, true],
+    ["analysis_preparation", "name_analysis_preparation", 55, 110, "ADD", {"name_analysis_preparation": "A".repeat(101)}, "name_analysis_preparation_max_size_KO"],
+
+    // Ampliacion: name_analysis_preparation con simbolos no permitidos
+    ["analysis_preparation", "name_analysis_preparation", 56, 111, "ADD", {"name_analysis_preparation": "Nombre@Invalido!!"}, "name_analysis_preparation_format_KO"],
+    ["analysis_preparation", "name_analysis_preparation", 56, 112, "ADD", {"name_analysis_preparation": "Valid Analysis Name"}, true],
+
+    // Ampliacion: description_analysis_preparation en limite exacto de min_size (80)
+    ["analysis_preparation", "description_analysis_preparation", 57, 113, "ADD", {"description_analysis_preparation": "A".repeat(80)}, true],
+    ["analysis_preparation", "description_analysis_preparation", 57, 114, "ADD", {"description_analysis_preparation": "A".repeat(79)}, "description_analysis_preparation_min_size_KO"],
+
+    // Ampliacion: description_analysis_preparation en limite exacto de max_size (5000)
+    ["analysis_preparation", "description_analysis_preparation", 58, 115, "ADD", {"description_analysis_preparation": "A".repeat(5000)}, true],
+    ["analysis_preparation", "description_analysis_preparation", 58, 116, "ADD", {"description_analysis_preparation": "A".repeat(5001)}, "description_analysis_preparation_max_size_KO"],
+
+    // Ampliacion: description_analysis_preparation con digitos no permitidos
+    ["analysis_preparation", "description_analysis_preparation", 59, 117, "ADD", {"description_analysis_preparation": "This description contains the number 12345 which is not allowed by the format rule for the field"}, "description_analysis_preparation_format_KO"],
+    ["analysis_preparation", "description_analysis_preparation", 59, 118, "ADD", {"description_analysis_preparation": "This is a valid description for the analysis preparation entity that has enough characters to pass the minimum size validation"}, true],
+
+    // Ampliacion: bib_analysis_preparation en limite exacto de min_size (6)
+    ["analysis_preparation", "bib_analysis_preparation", 60, 119, "ADD", {"bib_analysis_preparation": "A".repeat(6)}, true],
+    ["analysis_preparation", "bib_analysis_preparation", 60, 120, "ADD", {"bib_analysis_preparation": "A".repeat(5)}, "bib_analysis_preparation_min_size_KO"],
+
+    // Ampliacion: bib_analysis_preparation en limite exacto de max_size (200)
+    ["analysis_preparation", "bib_analysis_preparation", 61, 121, "ADD", {"bib_analysis_preparation": "A".repeat(200)}, true],
+    ["analysis_preparation", "bib_analysis_preparation", 61, 122, "ADD", {"bib_analysis_preparation": "A".repeat(201)}, "bib_analysis_preparation_max_size_KO"],
+
+    // Ampliacion: bib_analysis_preparation con digitos no permitidos
+    ["analysis_preparation", "bib_analysis_preparation", 62, 123, "ADD", {"bib_analysis_preparation": "Garcia, J. Estudio del ano 2024"}, "bib_analysis_preparation_format_KO"],
+    ["analysis_preparation", "bib_analysis_preparation", 62, 124, "ADD", {"bib_analysis_preparation": "Garcia, J. \"Analisis de suelos en regiones aridas\"."}, true],
+
+    // Ampliacion: file_analysis_preparation con tipo MIME doc valido
+    ["analysis_preparation", "file_analysis_preparation", 63, 125, "ADD", {"file_analysis_preparation": {"name": "documento.doc", "type": "application/msword", "size": 50000}}, true],
+    ["analysis_preparation", "file_analysis_preparation", 63, 126, "ADD", {"file_analysis_preparation": {"name": "imagen.jpg", "type": "image/jpeg", "size": 50000}}, "file_analysis_preparation_type_file_KO"],
+
+    // Ampliacion: file_analysis_preparation con tipo MIME docx valido
+    ["analysis_preparation", "file_analysis_preparation", 64, 127, "ADD", {"file_analysis_preparation": {"name": "documento.docx", "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "size": 50000}}, true],
+    ["analysis_preparation", "file_analysis_preparation", 64, 128, "ADD", {"file_analysis_preparation": {"name": "archivo.txt", "type": "text/plain", "size": 50000}}, "file_analysis_preparation_type_file_KO"],
+
+    // Ampliacion: file_analysis_preparation en el limite de max_size_file (menor de 2000000 bytes): 1999999 valido, 2000000 invalido
+    ["analysis_preparation", "file_analysis_preparation", 65, 129, "ADD", {"file_analysis_preparation": {"name": "documento.pdf", "type": "application/pdf", "size": 1999999}}, true],
+    ["analysis_preparation", "file_analysis_preparation", 65, 130, "ADD", {"file_analysis_preparation": {"name": "documento.pdf", "type": "application/pdf", "size": 2000000}}, "file_analysis_preparation_max_size_file_KO"],
+
+    // Ampliacion: file_analysis_preparation en limite exacto de min_size del nombre (7)
+    ["analysis_preparation", "file_analysis_preparation", 66, 131, "ADD", {"file_analysis_preparation": {"name": "abc.pdf", "type": "application/pdf", "size": 50000}}, true],
+    ["analysis_preparation", "file_analysis_preparation", 66, 132, "ADD", {"file_analysis_preparation": {"name": "ab.pdf", "type": "application/pdf", "size": 50000}}, "file_analysis_preparation_min_size_KO"],
+
+    // Ampliacion: file_analysis_preparation en limite exacto de max_size del nombre (100)
+    ["analysis_preparation", "file_analysis_preparation", 67, 133, "ADD", {"file_analysis_preparation": {"name": "a".repeat(96) + ".pdf", "type": "application/pdf", "size": 50000}}, true],
+    ["analysis_preparation", "file_analysis_preparation", 67, 134, "ADD", {"file_analysis_preparation": {"name": "a".repeat(97) + ".pdf", "type": "application/pdf", "size": 50000}}, "file_analysis_preparation_max_size_KO"]
 ];

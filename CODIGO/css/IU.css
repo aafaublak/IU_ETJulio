@@ -714,6 +714,25 @@ code {
     font-size: 0.8rem;
 }
 
+/* Scrollbars personalizados — selector universal para coherencia total */
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #111827; /* --surface */
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #334155; /* --border */
+    border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #3b82f6; /* --primary */
+}
+
 @media (max-width: 960px) {
     main#workspace {
         padding: 1rem;

@@ -99,7 +99,24 @@ var characteristic_def_tests = [
     // === file_characteristic - SEARCH (modo texto) ===
     ["characteristic", "file_characteristic", "input", 62, "Validar max_size de file en SEARCH", "SEARCH", "file_characteristic_max_size_KO", "Nombre del fichero demasiado largo en SEARCH"],
     ["characteristic", "file_characteristic", "input", 63, "Validar format de file en SEARCH", "SEARCH", "file_characteristic_format_KO", "Formato incorrecto en busqueda"],
-    ["characteristic", "file_characteristic", "input", 64, "Validar file correcto en SEARCH", "SEARCH", true, "Busqueda de fichero correcta"]
+    ["characteristic", "file_characteristic", "input", 64, "Validar file correcto en SEARCH", "SEARCH", true, "Busqueda de fichero correcta"],
+
+    // === Ampliacion caja negra: valores limite, clases invalidas adicionales y cobertura MIME ===
+    ["characteristic", "id_characteristic", "input", 65, "Validar id en limite exacto de max_size (11 digitos) en SEARCH", "SEARCH", true, "ID en el limite maximo permitido"],
+    ["characteristic", "name_characteristic", "input", 66, "Validar name en limite exacto de min_size (8) en ADD", "ADD", true, "Nombre en el limite minimo permitido"],
+    ["characteristic", "name_characteristic", "input", 67, "Validar name en limite exacto de max_size (100) en ADD", "ADD", true, "Nombre en el limite maximo permitido"],
+    ["characteristic", "name_characteristic", "input", 68, "Validar name con simbolos no permitidos en ADD", "ADD", "name_characteristic_format_KO", "Nombre con simbolos especiales"],
+    ["characteristic", "description_characteristic", "textarea", 69, "Validar description en limite exacto de min_size (80) en ADD", "ADD", true, "Descripcion en el limite minimo permitido"],
+    ["characteristic", "description_characteristic", "textarea", 70, "Validar description en limite exacto de max_size (5000) en ADD", "ADD", true, "Descripcion en el limite maximo permitido"],
+    ["characteristic", "description_characteristic", "textarea", 71, "Validar description con digitos no permitidos en ADD", "ADD", "description_characteristic_format_KO", "Descripcion con digitos"],
+    ["characteristic", "bibref_characteristic", "input", 72, "Validar bibref en limite exacto de min_size (16) en ADD", "ADD", true, "Referencia en el limite minimo permitido"],
+    ["characteristic", "bibref_characteristic", "input", 73, "Validar bibref en limite exacto de max_size (200) en ADD", "ADD", true, "Referencia en el limite maximo permitido"],
+    ["characteristic", "bibref_characteristic", "input", 74, "Validar bibref con digitos no permitidos en ADD", "ADD", "bibref_characteristic_format_KO", "Referencia con digitos"],
+    ["characteristic", "file_characteristic", "file", 75, "Validar file con tipo MIME doc en ADD", "ADD", true, "Fichero .doc valido"],
+    ["characteristic", "file_characteristic", "file", 76, "Validar file con tipo MIME docx en ADD", "ADD", true, "Fichero .docx valido"],
+    ["characteristic", "file_characteristic", "file", 77, "Validar file justo por debajo del limite de max_size_file (199999 bytes, menor de 200000) en ADD", "ADD", true, "Fichero por debajo del limite de tamano (valido)"],
+    ["characteristic", "file_characteristic", "file", 78, "Validar file en limite exacto de min_size del nombre (7) en ADD", "ADD", true, "Nombre de fichero en el limite minimo"],
+    ["characteristic", "file_characteristic", "file", 79, "Validar file en limite exacto de max_size del nombre (100) en ADD", "ADD", true, "Nombre de fichero en el limite maximo"]
 ];
 
 var characteristic_pruebas = [
@@ -230,5 +247,65 @@ var characteristic_pruebas = [
     ["characteristic", "file_characteristic", 63, 125, "SEARCH", {"file_characteristic": "archivo 123.pdf"}, "file_characteristic_format_KO"],
     ["characteristic", "file_characteristic", 63, 126, "SEARCH", {"file_characteristic": "documento.pdf"}, true],
     ["characteristic", "file_characteristic", 64, 127, "SEARCH", {"file_characteristic": "documento.pdf"}, true],
-    ["characteristic", "file_characteristic", 64, 128, "SEARCH", {"file_characteristic": "archivo 1.pdf"}, "file_characteristic_format_KO"]
+    ["characteristic", "file_characteristic", 64, 128, "SEARCH", {"file_characteristic": "archivo 1.pdf"}, "file_characteristic_format_KO"],
+
+    // Ampliacion: id_characteristic en limite exacto de max_size (11 digitos)
+    ["characteristic", "id_characteristic", 65, 129, "SEARCH", {"id_characteristic": "12345678901"}, true],
+    ["characteristic", "id_characteristic", 65, 130, "SEARCH", {"id_characteristic": "123456789012"}, "id_characteristic_max_size_KO"],
+
+    // Ampliacion: name_characteristic en limite exacto de min_size (8)
+    ["characteristic", "name_characteristic", 66, 131, "ADD", {"name_characteristic": "Caracter"}, true],
+    ["characteristic", "name_characteristic", 66, 132, "ADD", {"name_characteristic": "Caracte"}, "name_characteristic_min_size_KO"],
+
+    // Ampliacion: name_characteristic en limite exacto de max_size (100)
+    ["characteristic", "name_characteristic", 67, 133, "ADD", {"name_characteristic": "A".repeat(100)}, true],
+    ["characteristic", "name_characteristic", 67, 134, "ADD", {"name_characteristic": "A".repeat(101)}, "name_characteristic_max_size_KO"],
+
+    // Ampliacion: name_characteristic con simbolos no permitidos
+    ["characteristic", "name_characteristic", 68, 135, "ADD", {"name_characteristic": "Nombre@Invalido!!"}, "name_characteristic_format_KO"],
+    ["characteristic", "name_characteristic", 68, 136, "ADD", {"name_characteristic": "Valid Characteristic Name"}, true],
+
+    // Ampliacion: description_characteristic en limite exacto de min_size (80)
+    ["characteristic", "description_characteristic", 69, 137, "ADD", {"description_characteristic": "A".repeat(80)}, true],
+    ["characteristic", "description_characteristic", 69, 138, "ADD", {"description_characteristic": "A".repeat(79)}, "description_characteristic_min_size_KO"],
+
+    // Ampliacion: description_characteristic en limite exacto de max_size (5000)
+    ["characteristic", "description_characteristic", 70, 139, "ADD", {"description_characteristic": "A".repeat(5000)}, true],
+    ["characteristic", "description_characteristic", 70, 140, "ADD", {"description_characteristic": "A".repeat(5001)}, "description_characteristic_max_size_KO"],
+
+    // Ampliacion: description_characteristic con digitos no permitidos
+    ["characteristic", "description_characteristic", 71, 141, "ADD", {"description_characteristic": "This description contains the number 12345 which is not allowed by the format rule for the field"}, "description_characteristic_format_KO"],
+    ["characteristic", "description_characteristic", 71, 142, "ADD", {"description_characteristic": "This is a valid characteristic description that has enough length to pass the minimum size validation for the field"}, true],
+
+    // Ampliacion: bibref_characteristic en limite exacto de min_size (16)
+    ["characteristic", "bibref_characteristic", 72, 143, "ADD", {"bibref_characteristic": "A".repeat(16)}, true],
+    ["characteristic", "bibref_characteristic", 72, 144, "ADD", {"bibref_characteristic": "A".repeat(15)}, "bibref_characteristic_min_size_KO"],
+
+    // Ampliacion: bibref_characteristic en limite exacto de max_size (200)
+    ["characteristic", "bibref_characteristic", 73, 145, "ADD", {"bibref_characteristic": "A".repeat(200)}, true],
+    ["characteristic", "bibref_characteristic", 73, 146, "ADD", {"bibref_characteristic": "A".repeat(201)}, "bibref_characteristic_max_size_KO"],
+
+    // Ampliacion: bibref_characteristic con digitos no permitidos
+    ["characteristic", "bibref_characteristic", 74, 147, "ADD", {"bibref_characteristic": "Garcia, P. Estudio del ano 2024"}, "bibref_characteristic_format_KO"],
+    ["characteristic", "bibref_characteristic", 74, 148, "ADD", {"bibref_characteristic": "Garcia, P. \"Estudio amplio de suelos\"."}, true],
+
+    // Ampliacion: file_characteristic con tipo MIME doc valido
+    ["characteristic", "file_characteristic", 75, 149, "ADD", {"file_characteristic": {"name": "documento.doc", "type": "application/msword", "size": 50000}}, true],
+    ["characteristic", "file_characteristic", 75, 150, "ADD", {"file_characteristic": {"name": "imagen.jpg", "type": "image/jpeg", "size": 50000}}, "file_characteristic_type_file_KO"],
+
+    // Ampliacion: file_characteristic con tipo MIME docx valido
+    ["characteristic", "file_characteristic", 76, 151, "ADD", {"file_characteristic": {"name": "documento.docx", "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "size": 50000}}, true],
+    ["characteristic", "file_characteristic", 76, 152, "ADD", {"file_characteristic": {"name": "archivo.txt", "type": "text/plain", "size": 50000}}, "file_characteristic_type_file_KO"],
+
+    // Ampliacion: file_characteristic en el limite de max_size_file (menor de 200000 bytes): 199999 valido, 200000 invalido
+    ["characteristic", "file_characteristic", 77, 153, "ADD", {"file_characteristic": {"name": "documento.pdf", "type": "application/pdf", "size": 199999}}, true],
+    ["characteristic", "file_characteristic", 77, 154, "ADD", {"file_characteristic": {"name": "documento.pdf", "type": "application/pdf", "size": 200000}}, "file_characteristic_max_size_file_KO"],
+
+    // Ampliacion: file_characteristic en limite exacto de min_size del nombre (7)
+    ["characteristic", "file_characteristic", 78, 155, "ADD", {"file_characteristic": {"name": "abc.pdf", "type": "application/pdf", "size": 50000}}, true],
+    ["characteristic", "file_characteristic", 78, 156, "ADD", {"file_characteristic": {"name": "ab.pdf", "type": "application/pdf", "size": 50000}}, "file_characteristic_min_size_KO"],
+
+    // Ampliacion: file_characteristic en limite exacto de max_size del nombre (100)
+    ["characteristic", "file_characteristic", 79, 157, "ADD", {"file_characteristic": {"name": "a".repeat(96) + ".pdf", "type": "application/pdf", "size": 50000}}, true],
+    ["characteristic", "file_characteristic", 79, 158, "ADD", {"file_characteristic": {"name": "a".repeat(97) + ".pdf", "type": "application/pdf", "size": 50000}}, "file_characteristic_max_size_KO"]
 ];

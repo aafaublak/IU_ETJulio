@@ -171,17 +171,19 @@ class Validations {
     }
 
     /**
-     * Comprueba que el tamano en bytes del fichero seleccionado no
-     * supere el maximo indicado.
+     * Comprueba que el tamano en bytes del fichero seleccionado sea
+     * estrictamente MENOR que el maximo indicado, tal como exige el
+     * enunciado ("tamano de fichero menor de N bytes"). Por tanto un
+     * fichero de exactamente maxSize bytes NO se considera valido.
      *
      * @param {string} elementId id del input file.
-     * @param {number} maxSize tamano maximo en bytes.
-     * @returns {boolean} true si no supera el tamano.
+     * @param {number} maxSize tamano maximo en bytes (limite exclusivo).
+     * @returns {boolean} true si el tamano es estrictamente menor que maxSize.
      */
     max_size_file(elementId, maxSize) {
         var file = this.readFile(elementId);
         if (file === null) return false;
-        return file.size <= maxSize;
+        return file.size < maxSize;
     }
 
     /**
