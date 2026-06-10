@@ -152,6 +152,10 @@
             if (e.target === this) closeErrorModal();
         });
 
+        document.getElementById("result_overlay").addEventListener("click", function(e) {
+            if (e.target === this) closeResultModal();
+        });
+
         document.addEventListener("keydown", function(e) {
             if (e.key === "Escape") {
                 if (!document.getElementById("modal_overlay").hidden) closeErrorModal();

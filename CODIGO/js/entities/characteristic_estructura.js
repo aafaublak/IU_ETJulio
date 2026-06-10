@@ -84,7 +84,7 @@ var characteristic_estructura = {
 					format: ["^(number|text|set)$", "data_type_characteristic_format_KO"]
 				},
 				SEARCH: {
-					format: ["^(number|text|set)?$", "data_type_characteristic_format_KO"]
+					format: ["^(number|text|set)$", "data_type_characteristic_format_KO"]
 				}
 			}
 		},
@@ -99,7 +99,7 @@ var characteristic_estructura = {
 					format: ["^(soil_site|soil_chem|soil_bio)$", "category_characteristic_format_KO"]
 				},
 				SEARCH: {
-					format: ["^(soil_site|soil_chem|soil_bio)?$", "category_characteristic_format_KO"]
+					format: ["^(soil_site|soil_chem|soil_bio)$", "category_characteristic_format_KO"]
 				}
 			}
 		},

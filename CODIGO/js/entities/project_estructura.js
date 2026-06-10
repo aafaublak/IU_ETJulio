@@ -70,7 +70,7 @@ var project_estructura = {
 					date: "start_date_project_date_KO"
 				},
 				SEARCH: {
-					format: ["^(\\d{2}/\\d{2}/\\d{4})?$", "start_date_project_format_KO"]
+					format: ["^\\d{2}/\\d{2}/\\d{4}$", "start_date_project_format_KO"]
 				}
 			}
 		},
@@ -87,7 +87,7 @@ var project_estructura = {
 					personalize: true
 				},
 				SEARCH: {
-					format: ["^(\\d{2}/\\d{2}/\\d{4})?$", "end_date_project_format_KO"]
+					format: ["^\\d{2}/\\d{2}/\\d{4}$", "end_date_project_format_KO"]
 				}
 			}
 		},
@@ -147,7 +147,7 @@ var project_estructura = {
 				},
 				SEARCH: {
 					max_size: [500, "description_project_max_size_KO"],
-					format: ["^[\\x20-\\x7E\\n\\r\\t]*$", "description_project_format_KO"]
+					format: ["^[\\x20-\\x7E\\n\\r\\t]+$", "description_project_format_KO"]
 				}
 			}
 		},
