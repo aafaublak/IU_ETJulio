@@ -165,14 +165,14 @@ header#header_page .header-right {
     padding: 0.4rem 0.75rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    background-color: var(--surface-alt);
+    background-color: #ffffff;
     color: var(--primary);
     font-size: 0.9rem;
     font-weight: 500;
 }
 
 .api-link:hover {
-    background-color: var(--border);
+    background-color: #f0f0f0;
     color: var(--primary);
     text-decoration: none;
 }
@@ -714,7 +714,19 @@ code {
     font-size: 0.8rem;
 }
 
-/* Scrollbars personalizados — selector universal para coherencia total */
+/* Foco por teclado: que se note en que boton/enlace estamos al tabular */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Barra de scroll en Chrome/Edge. La pongo con * para que salga igual
+   en la pagina y dentro de los modales, que si no se ve la del navegador */
 *::-webkit-scrollbar {
     width: 8px;
     height: 8px;

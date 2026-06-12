@@ -5,9 +5,9 @@
  * atributo, los rellena con valores y lanza la validacion atomica
  * correspondiente apoyandose en la clase Validations.
  *
- * Los campos se generan dentro de un contenedor oculto del DOM
- * (_test_fields_container_) para que las pruebas tengan elementos
- * reales sobre los que actuar sin contaminar la pagina visible.
+ * Los campos se crean dentro de un contenedor oculto del DOM
+ * (_test_fields_container_): asi las validaciones trabajan sobre
+ * elementos reales del DOM pero como va oculto no se ve en la pagina.
  */
 class ValidateFieldsForm {
 

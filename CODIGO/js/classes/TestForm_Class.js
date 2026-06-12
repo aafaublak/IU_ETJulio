@@ -524,6 +524,8 @@ class TestForm {
         var html = '<div class="section">';
         html += '<h2>Informacion sobre las Pruebas</h2>';
 
+        html += '<button class="btn btn-primary" id="btn_ver_detalle_pruebas">Ver detalle de cada prueba</button>';
+
         html += '<div class="summary">';
         html += '<span><span class="label">Total pruebas:</span><span class="val">' + info.total + '</span></span>';
         html += '<span><span class="label">Bien definidas:</span><span class="val">' + info.wellDefined + '/' + info.total + '</span></span>';
@@ -552,8 +554,6 @@ class TestForm {
         } else {
             html += '<p>No hay pruebas de exito esperado.</p>';
         }
-
-        html += '<button class="btn btn-primary" id="btn_ver_detalle_pruebas">Ver detalle de cada prueba</button>';
 
         html += '</div>';
         return html;

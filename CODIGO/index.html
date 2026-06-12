@@ -163,6 +163,56 @@
             }
         });
 
+        // Foco en los modales. Cuando se abre uno guardo donde estaba el
+        // foco (normalmente el boton que lo abrio) para devolverselo al
+        // cerrar, llevo el foco al primer elemento del modal y dejo el
+        // tabulador dando vueltas dentro para que no se cuele al fondo.
+        var focoPrevio = {};
+
+        function elementosFocalizables(modal) {
+            var nodos = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            return Array.prototype.filter.call(nodos, function(el) {
+                return !el.disabled && !el.hidden && el.offsetParent !== null;
+            });
+        }
+
+        function cicloTabulador(modal, e) {
+            if (e.key !== "Tab") return;
+            var foco = elementosFocalizables(modal);
+            if (foco.length === 0) return;
+            var primero = foco[0];
+            var ultimo = foco[foco.length - 1];
+            if (e.shiftKey && document.activeElement === primero) {
+                e.preventDefault();
+                ultimo.focus();
+            } else if (!e.shiftKey && document.activeElement === ultimo) {
+                e.preventDefault();
+                primero.focus();
+            }
+        }
+
+        function gestionarFocoModal(overlayId) {
+            var overlay = document.getElementById(overlayId);
+            if (!overlay) return;
+            var modal = overlay.querySelector(".modal");
+
+            overlay.addEventListener("keydown", function(e) {
+                if (!overlay.hidden) cicloTabulador(overlay.querySelector(".modal"), e);
+            });
+
+            new MutationObserver(function() {
+                if (!overlay.hidden) {
+                    focoPrevio[overlayId] = document.activeElement;
+                    var visibles = elementosFocalizables(overlay.querySelector(".modal"));
+                    if (visibles.length > 0) visibles[0].focus();
+                } else {
+                    var anterior = focoPrevio[overlayId];
+                    if (anterior && typeof anterior.focus === "function") anterior.focus();
+                    focoPrevio[overlayId] = null;
+                }
+            }).observe(overlay, { attributes: true, attributeFilter: ["hidden"] });
+        }
+
         window.addEventListener("load", function() {
             buildMenu();
             document.getElementById("btn-menu").addEventListener("click", toggleMenu);
@@ -170,6 +220,8 @@
             document.getElementById("error_modal_back").addEventListener("click", closeErrorModal);
             document.getElementById("result_modal_close").addEventListener("click", closeResultModal);
             document.getElementById("result_modal_back").addEventListener("click", closeResultModal);
+            gestionarFocoModal("modal_overlay");
+            gestionarFocoModal("result_overlay");
         });
     </script>
 

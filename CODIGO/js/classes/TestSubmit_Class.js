@@ -387,6 +387,9 @@ class TestSubmit {
     buildSummaryHTML(results) {
         var html = '<div class="section">';
         html += '<h2>Resumen por Accion</h2>';
+
+        html += '<button class="btn btn-primary" id="btn_ver_detalle_submit">Ver detalle de todas las pruebas</button>';
+
         html += '<div class="summary">';
         html += '<span><span class="label">Total pruebas:</span><span class="val">' + results.total + '</span></span>';
         html += '<span><span class="label">Correctas:</span><span class="val ok">' + results.totalCorrect + '</span></span>';
@@ -405,7 +408,6 @@ class TestSubmit {
         });
         html += '</tbody></table>';
 
-        html += '<button class="btn btn-primary" id="btn_ver_detalle_submit">Ver detalle de todas las pruebas</button>';
         html += '</div>';
         return html;
     }
